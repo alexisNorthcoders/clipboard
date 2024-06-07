@@ -6,129 +6,7 @@
     <title>Clipboard Sync</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const socket = io();
-        const textarea = document.getElementById("clipboard");
-        const fileInput = document.getElementById("file");
-        const uploadButton = document.getElementById("uploadFile");
-        const pasteButton = document.getElementById("pasteClipboard");
-        const copyButton = document.getElementById("copyClipboard");
-        const clearButton = document.getElementById("clearClipboard");
-        const filesListDiv = document.getElementById("filesList");
-
-        textarea.addEventListener("input", () => {
-          socket.emit("clipboard", textarea.value);
-        });
-
-        uploadButton.addEventListener("click", () => {
-          const file = fileInput.files[0];
-          if (file) {
-            const formData = new FormData();
-            formData.append("file", file);
-
-            fetch("/upload", {
-              method: "POST",
-              body: formData,
-            })
-              .then((response) => {
-                if (!response.ok) {
-                  throw new Error("Network response was not ok");
-                }
-                return response.json();
-              })
-              .then((data) => {
-                console.log("File uploaded:", data.fileUrl);
-              })
-              .catch((error) => {
-                console.error("Error uploading file:", error);
-              });
-          } else {
-            console.error("No file selected.");
-          }
-        });
-
-        pasteButton.addEventListener("click", async () => {
-          try {
-            const text = await navigator.clipboard.readText();
-            textarea.value = text;
-            socket.emit("clipboard", text); 
-          } catch (err) {
-            console.error("Failed to read clipboard contents: ", err);
-          }
-        });
-        clearButton.addEventListener("click", async () => {
-          try {
-            const text = ""
-            textarea.value = text;
-            socket.emit("clipboard", text); 
-          } catch (err) {
-            console.error("Failed to read clipboard contents: ", err);
-          }
-        });
-
-        copyButton.addEventListener("click", async () => {
-          try {
-            await navigator.clipboard.writeText(textarea.value);
-            console.log("Text copied to clipboard:", textarea.value);
-          } catch (err) {
-            console.error("Failed to copy text to clipboard: ", err);
-          }
-        });
-        socket.on("clipboard", (data) => {
-          textarea.value = data;
-        });
-
-        socket.on("filesUploaded", (files) => {
-          filesListDiv.innerHTML = files
-            .map(
-              (file) => `
-            <div class="flex flex-row items-center gap-1">
-              <button onclick="downloadFile('${file.url}')" class="px-4 py-1 bg-green-500 rounded text-white font-bold hover:bg-green-600">Download</button>
-              <a href="${file.url}" target="_blank" class="text-blue-800 font-bold hover:underline">${file.name}</a>
-              <span>Size: ${(file.size / 1024).toFixed(2)} KB</span>
-              <span>Created: ${new Date(file.created).toLocaleString()}</span>
-              
-            </div>
-          `
-            )
-            .join("");
-        });
-      });
-      document.addEventListener('paste', function(event) {
-        const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-        for (const item of items) {
-         if (item.type.indexOf('image') !== -1) {
-           const blob = item.getAsFile();
-           displayImage(blob);
-            }
-       }
-      });
-      function downloadFile(url) {
-         const link = document.createElement('a');
-         link.href = url;
-         link.download = url.split('/').pop();
-         document.body.appendChild(link);
-         link.click();
-         document.body.removeChild(link);
-      }
-      function displayImage(blob) {
-       const reader = new FileReader();
-
-        reader.onload = function(event) {
-         const imageUrl = event.target.result;
-
-         const img = document.createElement('img');
-          img.src = imageUrl;
-
-         const container = document.getElementById('imageContainer');
-          container.innerHTML = ''; 
-         container.appendChild(img);
-  };
- 
-  reader.readAsDataURL(blob);
-}
-    </script>
+    <script src="./index.js"></script>
   </head>
   <body class="bg-gray-100">
     <div class="container mx-auto py-8">
@@ -138,7 +16,7 @@
         <div class="w-1/2 flex flex-col gap-2">
           <h1 class="font-semibold">Preview clipboard image</h1>
           <div class="w-full h-full border-4 border-gray-500 rounded-md" id="imageContainer"></div>
-          <button class="w-20 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Share</button>
+          <button id="shareImage" class="w-20 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Share</button>
         </div>
 
       </div>
