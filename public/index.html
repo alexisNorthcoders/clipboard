@@ -94,7 +94,15 @@
             .join("");
         });
       });
-
+      document.addEventListener('paste', function(event) {
+        const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+        for (const item of items) {
+         if (item.type.indexOf('image') !== -1) {
+           const blob = item.getAsFile();
+           displayImage(blob);
+            }
+       }
+      });
       function downloadFile(url) {
          const link = document.createElement('a');
          link.href = url;
@@ -103,12 +111,32 @@
          link.click();
          document.body.removeChild(link);
       }
+      function displayImage(blob) {
+  const reader = new FileReader();
+
+  reader.onload = function(event) {
+    const imageUrl = event.target.result;
+
+    const img = document.createElement('img');
+    img.src = imageUrl;
+
+    const container = document.getElementById('imageContainer');
+    container.innerHTML = ''; 
+    container.appendChild(img);
+  };
+ 
+  reader.readAsDataURL(blob);
+}
     </script>
   </head>
   <body class="bg-gray-100">
     <div class="container mx-auto py-8">
       <h1 class="text-2xl font-bold mb-4">Clipboard Sync</h1>
-      <textarea id="clipboard" class="w-full p-2 border rounded" rows="10" cols="30"></textarea>
+      <div class="w-full flex flex-row">
+        <textarea id="clipboard" class="w-1/2 p-2 border rounded" rows="10" cols="30"></textarea>
+        <div class="w-1/2" id="imageContainer"></div>
+
+      </div>
       <button id="pasteClipboard" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4">Paste</button>
       <button id="copyClipboard" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4">Copy</button>
       <button id="clearClipboard" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mt-4">Clear</button>
