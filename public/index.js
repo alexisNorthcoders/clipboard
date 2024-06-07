@@ -136,8 +136,9 @@ function uploadImageFromClipboard() {
         clipboardItem.types.forEach(type => {
           if (type.startsWith('image')) {
             clipboardItem.getType(type).then(blob => {
+                console.log(blob)
               const formData = new FormData();
-              formData.append('file', blob, 'clipboard_image.png');
+              formData.append('file', blob, `clipboard_image_${Date.now()}.png`);
 
               fetch('/upload', {
                 method: 'POST',
