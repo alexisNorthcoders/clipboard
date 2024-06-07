@@ -11,15 +11,12 @@
         const textarea = document.getElementById("clipboard");
         const fileInput = document.getElementById("file");
         const uploadButton = document.getElementById("uploadFile");
-        const filesListDiv = document.getElementById("filesList");
         const pasteButton = document.getElementById("pasteClipboard");
+        const copyButton = document.getElementById("copyClipboard");
+        const filesListDiv = document.getElementById("filesList");
 
         textarea.addEventListener("input", () => {
           socket.emit("clipboard", textarea.value);
-        });
-
-        socket.on("clipboard", (data) => {
-          textarea.value = data;
         });
 
         uploadButton.addEventListener("click", () => {
@@ -48,23 +45,41 @@
             console.error("No file selected.");
           }
         });
+
         pasteButton.addEventListener("click", async () => {
           try {
             const text = await navigator.clipboard.readText();
             textarea.value = text;
-            socket.emit("clipboard", text);
+            socket.emit("clipboard", text); 
           } catch (err) {
             console.error("Failed to read clipboard contents: ", err);
           }
-        });  
+        });
+
+        copyButton.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(textarea.value);
+            console.log("Text copied to clipboard:", textarea.value);
+          } catch (err) {
+            console.error("Failed to copy text to clipboard: ", err);
+          }
+        });
+        socket.on("clipboard", (data) => {
+          textarea.value = data;
+        });
+
         socket.on("filesUploaded", (files) => {
-          filesListDiv.innerHTML = files.map(file => `
+          filesListDiv.innerHTML = files
+            .map(
+              (file) => `
             <div>
               <a href="${file.url}" target="_blank">${file.name}</a>
               <span>Size: ${(file.size / 1024).toFixed(2)} KB</span>
               <span>Created: ${new Date(file.created).toLocaleString()}</span>
             </div>
-          `).join('');
+          `
+            )
+            .join("");
         });
       });
     </script>
@@ -77,6 +92,7 @@
     <button id="uploadFile">Upload File</button>
     <br />
     <button id="pasteClipboard">Paste from Clipboard</button>
+    <button id="copyClipboard">Copy to Clipboard</button>
     <br />
     <div id="filesList"></div>
   </body>
