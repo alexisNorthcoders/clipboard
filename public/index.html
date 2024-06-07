@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clipboard Sync</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
@@ -84,16 +85,16 @@
       });
     </script>
   </head>
-  <body>
-    <h1>Clipboard Sync</h1>
-    <textarea id="clipboard" rows="10" cols="30"></textarea>
-    <br />
-    <input type="file" id="file" />
-    <button id="uploadFile">Upload File</button>
-    <br />
-    <button id="pasteClipboard">Paste from Clipboard</button>
-    <button id="copyClipboard">Copy to Clipboard</button>
-    <br />
-    <div id="filesList"></div>
+  <body class="bg-gray-100">
+    <div class="container mx-auto py-8">
+      <h1 class="text-2xl font-bold mb-4">Clipboard Sync</h1>
+      <textarea id="clipboard" class="w-full p-2 border rounded mb-4" rows="10" cols="30"></textarea>
+      <input type="file" id="file" class="mb-4">
+      <button id="uploadFile" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Upload File</button>
+      <br>
+      <button id="pasteClipboard" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4">Paste from Clipboard</button>
+      <button id="copyClipboard" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4">Copy to Clipboard</button>
+      <div id="filesList" class="mt-8"></div>
+    </div>
   </body>
 </html>
