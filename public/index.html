@@ -87,24 +87,36 @@
               <a href="${file.url}" target="_blank">${file.name}</a>
               <span>Size: ${(file.size / 1024).toFixed(2)} KB</span>
               <span>Created: ${new Date(file.created).toLocaleString()}</span>
+              <button onclick="downloadFile('${file.url}')" class="px-4 py-2 bg-green-500 rounded-lg text-white font-bold hover:bg-green-600">Download</button>
             </div>
           `
             )
             .join("");
         });
       });
+
+      function downloadFile(url) {
+         const link = document.createElement('a');
+         link.href = url;
+         link.download = url.split('/').pop();
+         document.body.appendChild(link);
+         link.click();
+         document.body.removeChild(link);
+      }
     </script>
   </head>
   <body class="bg-gray-100">
     <div class="container mx-auto py-8">
       <h1 class="text-2xl font-bold mb-4">Clipboard Sync</h1>
-      <textarea id="clipboard" class="w-full p-2 border rounded mb-4" rows="10" cols="30"></textarea>
-      <input type="file" id="file" class="mb-4">
-      <button id="uploadFile" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Upload File</button>
-      <br>
+      <textarea id="clipboard" class="w-full p-2 border rounded" rows="10" cols="30"></textarea>
       <button id="pasteClipboard" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4">Paste</button>
       <button id="copyClipboard" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4">Copy</button>
       <button id="clearClipboard" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mt-4">Clear</button>
+      <div class="py-2">
+        <input type="file" id="file" class="mb-4">
+        <button id="uploadFile" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Upload File</button>
+      </div>
+    
       <div id="filesList" class="mt-8"></div>
     </div>
   </body>
