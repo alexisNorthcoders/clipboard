@@ -14,6 +14,7 @@
         const uploadButton = document.getElementById("uploadFile");
         const pasteButton = document.getElementById("pasteClipboard");
         const copyButton = document.getElementById("copyClipboard");
+        const clearButton = document.getElementById("clearClipboard");
         const filesListDiv = document.getElementById("filesList");
 
         textarea.addEventListener("input", () => {
@@ -56,6 +57,15 @@
             console.error("Failed to read clipboard contents: ", err);
           }
         });
+        clearButton.addEventListener("click", async () => {
+          try {
+            const text = ""
+            textarea.value = text;
+            socket.emit("clipboard", text); 
+          } catch (err) {
+            console.error("Failed to read clipboard contents: ", err);
+          }
+        });
 
         copyButton.addEventListener("click", async () => {
           try {
@@ -92,8 +102,9 @@
       <input type="file" id="file" class="mb-4">
       <button id="uploadFile" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Upload File</button>
       <br>
-      <button id="pasteClipboard" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4">Paste from Clipboard</button>
-      <button id="copyClipboard" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4">Copy to Clipboard</button>
+      <button id="pasteClipboard" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4">Paste</button>
+      <button id="copyClipboard" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4">Copy</button>
+      <button id="clearClipboard" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mt-4">Clear</button>
       <div id="filesList" class="mt-8"></div>
     </div>
   </body>
