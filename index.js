@@ -37,7 +37,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
 
     const fileUrls = files.map((file) => `/uploads/${file}`);
     io.emit("filesUploaded", fileUrls);
-    res.json({ fileUrl });
+    res.status(201).json({ fileUrl,message:"File uploaded successfully" });
   });
 });
 
