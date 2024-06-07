@@ -4,6 +4,7 @@ const socketIo = require("socket.io");
 const path = require("path");
 const fs = require("fs");
 const upload = require("./multer");
+const { getFileInformation } = require("./utils");
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -12,17 +13,15 @@ app.use(express.json());
 app.use(express.static("public"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.get("/upload", (req, res) => {
-  const uploadDir = path.join(__dirname, "uploads");
-
-  fs.readdir(uploadDir, (err, files) => {
-    if (err) {
-      console.error("Error reading directory:", err);
-      return res.status(500).json({ error: "Error reading directory" });
+app.get('/upload', async (req, res) => {
+    try {
+      const fileInfos = await getFileInformation(path.join(__dirname, 'uploads'));
+      res.json({ files: fileInfos });
+    } catch (err) {
+      console.error("Error getting file stats:", err);
+      res.status(500).json({ error: "Error getting file stats" });
     }
-    res.json({ files });
   });
-});
 app.post("/upload", upload.single("file"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
