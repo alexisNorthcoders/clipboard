@@ -3,7 +3,8 @@ const fs = require("fs");
 const path = require("path");
 const server = require("../index");
 
-describe("File Upload", () => {
+describe("POST /upload", () => {
+ 
   it("should upload a file", async () => {
     const sampleFilePath = path.join(__dirname, "sample.txt");
     fs.writeFileSync(sampleFilePath, "Sample text file content");
@@ -21,6 +22,14 @@ describe("File Upload", () => {
     const response = await request(server).post("/upload");
 
     expect(response.status).toBe(400);
+  });
+});
+describe("GET /upload", function () {
+  it('should return a list of files in the "uploads" folder', async () => {
+    const response = await request(server).get("/upload");
+
+    expect(response.status).toBe(200);
+    expect(response.body.hasOwnProperty("files")).toBe(true);
   });
 });
 describe("Server", () => {

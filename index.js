@@ -8,9 +8,21 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+app.use(express.json());
 app.use(express.static("public"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+app.get("/upload", (req, res) => {
+  const uploadDir = path.join(__dirname, "uploads");
+
+  fs.readdir(uploadDir, (err, files) => {
+    if (err) {
+      console.error("Error reading directory:", err);
+      return res.status(500).json({ error: "Error reading directory" });
+    }
+    res.json({ files });
+  });
+});
 app.post("/upload", (req, res) => {
   if (!req.files || !req.files.file) {
     return res.status(400).json({ error: "No file uploaded" });
@@ -21,12 +33,19 @@ app.post("/upload", (req, res) => {
   const filePath = path.join(__dirname, "uploads", fileName);
 
   const writeStream = fs.createWriteStream(filePath);
+
   file.data.pipe(writeStream);
 
-  const fileUrl = `/uploads/${fileName}`;
-  io.emit("file", fileUrl);
+  writeStream.on("finish", () => {
+    const fileUrl = `/uploads/${fileName}`;
+    io.emit("file", fileUrl);
+    res.status(200).json({ fileUrl });
+  });
 
-  res.status(200).json({ fileUrl });
+  writeStream.on("error", (err) => {
+    console.error("Error saving file:", err);
+    res.status(500).json({ error: "Error saving file" });
+  });
 });
 
 let currentClipboardData = "";
