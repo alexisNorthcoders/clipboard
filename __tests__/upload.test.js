@@ -14,8 +14,19 @@ describe("POST /upload", () => {
       .attach("file", sampleFilePath);
 
     expect(response.status).toBe(201);
-    
+    fs.unlinkSync(sampleFilePath);
+  });
+  it("should upload a file and respond with url", async () => {
+    const sampleFilePath = path.join(__dirname, "sample.txt");
+    fs.writeFileSync(sampleFilePath, "Sample text file content");
 
+    const response = await request(server)
+      .post("/upload")
+      .attach("file", sampleFilePath);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual(expect.objectContaining({ message: "File uploaded successfully" }));
+    expect(response.body.fileUrl).toBeDefined();
     fs.unlinkSync(sampleFilePath);
   });
   it("should error 400 if file not uploaded", async () => {

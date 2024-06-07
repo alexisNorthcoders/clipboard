@@ -3,18 +3,10 @@ const http = require("http");
 const socketIo = require("socket.io");
 const path = require("path");
 const fs = require("fs");
-const multer = require("multer");
 const upload = require("./multer");
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-
-const storageConfig = multer.diskStorage({
-  destination: path.join(__dirname, "uploads"),
-  filename: (req, file, res) => {
-    res(null, Date.now() + "-" + file.originalname);
-  },
-});
 
 app.use(express.json());
 app.use(express.static("public"));
@@ -32,10 +24,14 @@ app.get("/upload", (req, res) => {
   });
 });
 app.post("/upload", upload.single("file"), (req, res) => {
-  if (!req.file ) {
+  if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
-  res.status(201).json("Files uploaded successfully");
+  const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${
+    req.file.filename
+  }`;
+  io.emit("fileUploaded", fileUrl);
+  res.status(201).json({ message: "File uploaded successfully", fileUrl });
 });
 
 let currentClipboardData = "";
