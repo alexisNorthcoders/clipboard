@@ -2,6 +2,7 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
 const server = http.createServer(app);
@@ -16,16 +17,16 @@ app.post("/upload", (req, res) => {
   }
 
   const file = req.files.file;
+  const fileName = file.name;
+  const filePath = path.join(__dirname, "uploads", fileName);
 
-  file.mv(path.join(__dirname, "uploads", file.name), (err) => {
-    if (err) {
-      return res.status(500).json({ error: "File upload failed" });
-    }
+  const writeStream = fs.createWriteStream(filePath);
+  file.data.pipe(writeStream);
 
-    const fileUrl = `/uploads/${file.name}`;
-    io.emit("file", fileUrl);
-    res.status(200).json({ fileUrl });
-  });
+  const fileUrl = `/uploads/${fileName}`;
+  io.emit("file", fileUrl);
+
+  res.status(200).json({ fileUrl });
 });
 
 let currentClipboardData = "";
