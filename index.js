@@ -32,7 +32,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   try {
     const fileInfos = await getFileInformation(path.join(__dirname, "uploads"));
     io.emit("filesUploaded", fileInfos);
-    res.json({ fileUrl });
+    res.status(201).json({ fileUrl,message:"File uploaded successfully" });
   } catch (err) {
     console.error("Error getting file stats:", err);
     res.status(500).send("Error getting file stats.");
