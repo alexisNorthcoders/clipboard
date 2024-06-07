@@ -48,8 +48,14 @@
           }
         });
 
-        socket.on("filesUploaded", (fileUrls) => {
-          filesListDiv.innerHTML = fileUrls.map(fileUrl => `<div><a href="${fileUrl}" target="_blank">${fileUrl}</a></div>`).join('');
+        socket.on("filesUploaded", (files) => {
+          filesListDiv.innerHTML = files.map(file => `
+            <div>
+              <a href="${file.url}" target="_blank">${file.name}</a>
+              <span>Size: ${(file.size / 1024).toFixed(2)} KB</span>
+              <span>Created: ${new Date(file.created).toLocaleString()}</span>
+            </div>
+          `).join('');
         });
       });
     </script>
