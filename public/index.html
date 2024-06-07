@@ -11,6 +11,7 @@
         const textarea = document.getElementById("clipboard");
         const fileInput = document.getElementById("file");
         const uploadButton = document.getElementById("uploadFile");
+        const filesListDiv = document.getElementById("filesList");
 
         textarea.addEventListener("input", () => {
           socket.emit("clipboard", textarea.value);
@@ -46,6 +47,10 @@
             console.error("No file selected.");
           }
         });
+
+        socket.on("filesUploaded", (fileUrls) => {
+          filesListDiv.innerHTML = fileUrls.map(fileUrl => `<div><a href="${fileUrl}" target="_blank">${fileUrl}</a></div>`).join('');
+        });
       });
     </script>
   </head>
@@ -55,5 +60,7 @@
     <br />
     <input type="file" id="file" />
     <button id="uploadFile">Upload File</button>
+    <br />
+    <div id="filesList"></div>
   </body>
 </html>

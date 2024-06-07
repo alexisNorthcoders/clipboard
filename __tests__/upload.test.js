@@ -1,10 +1,9 @@
 const request = require("supertest");
 const fs = require("fs");
 const path = require("path");
-const server = require("../index");
+const {server} = require("../index");
 
 describe("POST /upload", () => {
- 
   it("should upload a file", async () => {
     const sampleFilePath = path.join(__dirname, "sample.txt");
     fs.writeFileSync(sampleFilePath, "Sample text file content");
@@ -25,7 +24,9 @@ describe("POST /upload", () => {
       .attach("file", sampleFilePath);
 
     expect(response.status).toBe(201);
-    expect(response.body).toEqual(expect.objectContaining({ message: "File uploaded successfully" }));
+    expect(response.body).toEqual(
+      expect.objectContaining({ message: "File uploaded successfully" })
+    );
     expect(response.body.fileUrl).toBeDefined();
     fs.unlinkSync(sampleFilePath);
   });
