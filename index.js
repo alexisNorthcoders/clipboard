@@ -8,11 +8,15 @@ const io = socketIo(server);
 
 app.use(express.static("public"));
 
+let currentClipboardData = '';
+
 io.on("connection", (socket) => {
   console.log("A user connected");
+  socket.emit('clipboard', currentClipboardData);
 
   socket.on("clipboard", (data) => {
     console.log("Clipboard data received:", data);
+    currentClipboardData = data;
 
     socket.broadcast.emit("clipboard", data);
   });
