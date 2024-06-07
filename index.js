@@ -27,11 +27,18 @@ app.post("/upload", upload.single("file"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
-  const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${
-    req.file.filename
-  }`;
-  io.emit("fileUploaded", fileUrl);
-  res.status(201).json({ message: "File uploaded successfully", fileUrl });
+
+  const fileUrl = `/uploads/${req.file.filename}`;
+
+  fs.readdir("uploads", (err, files) => {
+    if (err) {
+      return res.status(500).send("Error reading uploads folder.");
+    }
+
+    const fileUrls = files.map((file) => `/uploads/${file}`);
+    io.emit("filesUploaded", fileUrls);
+    res.json({ fileUrl });
+  });
 });
 
 let currentClipboardData = "";
@@ -39,6 +46,15 @@ let currentClipboardData = "";
 io.on("connection", (socket) => {
   console.log("A user connected");
   socket.emit("clipboard", currentClipboardData);
+  fs.readdir("uploads", (err, files) => {
+    if (err) {
+      console.error("Error reading uploads folder.");
+      return;
+    }
+
+    const fileUrls = files.map((file) => `/uploads/${file}`);
+    socket.emit("filesUploaded", fileUrls);
+  });
 
   socket.on("clipboard", (data) => {
     console.log("Clipboard data received:", data);
@@ -52,4 +68,4 @@ io.on("connection", (socket) => {
   });
 });
 
-module.exports = server;
+module.exports = { server, io };
