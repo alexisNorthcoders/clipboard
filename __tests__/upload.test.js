@@ -13,8 +13,8 @@ describe("POST /upload", () => {
       .post("/upload")
       .attach("file", sampleFilePath);
 
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty("fileUrl");
+    expect(response.status).toBe(201);
+    
 
     fs.unlinkSync(sampleFilePath);
   });

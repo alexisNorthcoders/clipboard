@@ -3,10 +3,18 @@ const http = require("http");
 const socketIo = require("socket.io");
 const path = require("path");
 const fs = require("fs");
-
+const multer = require("multer");
+const upload = require("./multer");
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+
+const storageConfig = multer.diskStorage({
+  destination: path.join(__dirname, "uploads"),
+  filename: (req, file, res) => {
+    res(null, Date.now() + "-" + file.originalname);
+  },
+});
 
 app.use(express.json());
 app.use(express.static("public"));
@@ -23,29 +31,11 @@ app.get("/upload", (req, res) => {
     res.json({ files });
   });
 });
-app.post("/upload", (req, res) => {
-  if (!req.files || !req.files.file) {
+app.post("/upload", upload.single("file"), (req, res) => {
+  if (!req.file ) {
     return res.status(400).json({ error: "No file uploaded" });
   }
-
-  const file = req.files.file;
-  const fileName = file.name;
-  const filePath = path.join(__dirname, "uploads", fileName);
-
-  const writeStream = fs.createWriteStream(filePath);
-
-  file.data.pipe(writeStream);
-
-  writeStream.on("finish", () => {
-    const fileUrl = `/uploads/${fileName}`;
-    io.emit("file", fileUrl);
-    res.status(200).json({ fileUrl });
-  });
-
-  writeStream.on("error", (err) => {
-    console.error("Error saving file:", err);
-    res.status(500).json({ error: "Error saving file" });
-  });
+  res.status(201).json("Files uploaded successfully");
 });
 
 let currentClipboardData = "";
