@@ -10,7 +10,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const shareButton = document.getElementById('shareImage');
   const loginButton = document.getElementById('loginButton')
   const registerButton = document.getElementById('registerButton')
+  const currentButton = document.getElementById('currentButton')
   
+  currentButton.addEventListener('click', async () => {
+   
+    const accessToken = localStorage.getItem('accessToken');
+    const response = await fetch('/current', {
+      method: 'GET',
+      headers: {
+       'Authorization': `Bearer ${accessToken}`,
+       'Content-Type': 'application/json'
+      }
+    });
+  
+    if (response.ok) {
+      
+      const data = await response.json();
+      console.log(data)
+      console.log("Current user is "+ data.username)
+    } else {
+      console.error('Failed to log in!');
+    }
+  });
   loginButton.addEventListener('click', async () => {
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
