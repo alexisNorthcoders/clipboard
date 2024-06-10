@@ -29,7 +29,7 @@ app.post('/webhook', (req, res) => {
   });
 });
 app.get("/webhook",(req,res)=>{
-  res.status(200).send('This is a webhook for github deployment.');
+  res.status(200).send('Making sure webhook is working correctly.');
 })
 
 app.get("/upload", async (req, res) => {
