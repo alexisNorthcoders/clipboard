@@ -23,7 +23,9 @@ document.addEventListener("DOMContentLoaded", () => {
   
     if (response.ok) {
       console.log('Logged in successfully!');
-      console.log(response.body)
+      const data = await response.json();
+      localStorage.setItem('accessToken', data.accessToken);
+      console.log(data.accessToken)
     } else {
       console.error('Failed to log in!');
     }
