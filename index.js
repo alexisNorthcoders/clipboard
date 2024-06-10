@@ -8,10 +8,26 @@ const { getFileInformation } = require("./utils");
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-
+const bodyParser = require('body-parser');
+const { exec } = require('child_process');
+const crypto = require('crypto');
+const secret = process.env.SECRET
 app.use(express.json());
 app.use(express.static("public"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use('/webhook', bodyParser.json({ verify: verifySignature }));
+
+app.post('/webhook', (req, res) => {
+  
+  exec('./deploy.sh', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).send(`Deployment script failed: ${stderr}`);
+    }
+    console.log(`stdout: ${stdout}`);
+    res.status(200).send('Deployment script executed successfully.');
+  });
+});
 
 app.get("/upload", async (req, res) => {
   try {
@@ -61,5 +77,12 @@ io.on("connection", async (socket) => {
     console.log("A user disconnected");
   });
 });
+
+function verifySignature(req, res, buf) {
+  const signature = `sha256=${crypto.createHmac('sha256', secret).update(buf).digest('hex')}`;
+  if (req.headers['x-hub-signature-256'] !== signature) {
+    throw new Error('Invalid signature.');
+  }
+}
 
 module.exports = { server, io };
