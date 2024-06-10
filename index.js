@@ -15,6 +15,7 @@ const db = new sqlite3.Database("./DB/database.sqlite");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
+const { validateToken } = require("./middleware/tokenvalidator");
 require("dotenv").config();
 
 app.use(express.json());
@@ -112,6 +113,9 @@ app.post("/login", (req, res) => {
     res.status(200).send({ message: "Login successful!", accessToken });
   });
 });
+app.get("/current",validateToken,(req,res)=>{
+  res.send(req.user)
+})
 
 let currentClipboardData = "";
 

@@ -1,4 +1,4 @@
-import { verify } from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
 
 const validateToken = (req, res, next) => {
     try {
@@ -6,7 +6,7 @@ const validateToken = (req, res, next) => {
         let authHeader = req.headers.Authorization || req.headers.authorization;
         if (authHeader && authHeader.startsWith("Bearer")) {
             token = authHeader.split(" ")[1];
-            verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+            jwt.verify(token, process.env.DATABASE_SECRET, (err, decoded) => {
                 if (err) {
                     res.status(401);
                     throw new Error("User is not authorized");
@@ -22,5 +22,4 @@ const validateToken = (req, res, next) => {
         next(error);
     }
 };
-
-export default validateToken;
+module.exports= {validateToken};
