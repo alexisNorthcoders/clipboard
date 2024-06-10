@@ -50,16 +50,24 @@ describe("GET /upload", () => {
     expect(response.body.hasOwnProperty("files")).toBe(true);
   });
 });
-
 describe("POST /register", () => {
   it("should create a new user with username and password properties", async () => {
     const user = {
-      username: "sssssss",
+      username: "Alexis",
       password: "test",
     };
     const response = await request(server).post("/register").send(user);
     expect(response.body.message).toBe("User created successfully");
     expect(response.status).toBe(200);
+  });
+  it("should error if user already exists", async () => {
+    const user = {
+      username: "Alexis",
+      password: "test",
+    };
+    const response = await request(server).post("/register").send(user);
+    expect(response.body.message).toBe("Error registering new user.");
+    expect(response.status).toBe(400);
   });
   it("should not register a user without a username", async () => {
     const user = {
@@ -67,7 +75,28 @@ describe("POST /register", () => {
     };
     const response = await request(server).post("/register").send(user);
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(400);
     expect(response.body.message).toBe("Error registering new user.");
+  });
+});
+describe("POST /login", () => {
+  it("should error if User not found", async () => {
+    const user = {
+      username: "notfound",
+      password: "test",
+    };
+    const response = await request(server).post("/login").send(user);
+    expect(response.body.message).toBe("User not found.");
+    expect(response.status).toBe(404);
+  });
+  it("should respond with accessToken if login is valid", async () => {
+    const user = {
+      username: "Alexis",
+      password: "test",
+    };
+    const response = await request(server).post("/login").send(user);
+    expect(response.body.message).toBe("Login successful!");
+    expect(response.body.accessToken).toBeDefined();
+    expect(response.status).toBe(200);
   });
 });

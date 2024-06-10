@@ -78,7 +78,7 @@ app.post("/register", (req, res) => {
     [username, hashedPassword],
     (err) => {
       if (err) {
-        return res.status(500).send({message:"Error registering new user."});
+        return res.status(400).send({message:"Error registering new user."});
       }
       console.log("New user created.");
       res.status(200).send({message:"User created successfully"});
@@ -93,7 +93,7 @@ app.post("/login", (req, res) => {
       return res.status(500).send("Error on the server.");
     }
     if (!user) {
-      return res.status(404).send("User not found.");
+      return res.status(404).send({message:"User not found."});
     }
 
     const passwordIsValid = bcrypt.compareSync(password, user.password);
