@@ -78,10 +78,10 @@ app.post("/register", (req, res) => {
     [username, hashedPassword],
     (err) => {
       if (err) {
-        return res.status(500).send("Error registering new user.");
+        return res.status(500).send({message:"Error registering new user."});
       }
       console.log("New user created.");
-      res.status(200).send("User created successfully");
+      res.status(200).send({message:"User created successfully"});
     }
   );
 });
