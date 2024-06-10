@@ -8,6 +8,44 @@ document.addEventListener("DOMContentLoaded", () => {
   const clearButton = document.getElementById("clearClipboard");
   const filesListDiv = document.getElementById("filesList");
   const shareButton = document.getElementById('shareImage');
+  const loginButton = document.getElementById('loginButton')
+  const registerButton = document.getElementById('registerButton')
+  
+  loginButton.addEventListener('click', async () => {
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+  
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+  
+    if (response.ok) {
+      console.log('Logged in successfully!');
+      console.log(response.body)
+    } else {
+      console.error('Failed to log in!');
+    }
+  });
+  
+  registerButton.addEventListener('click', async () => {
+    const username = document.getElementById('registerUsername').value;
+    const password = document.getElementById('registerPassword').value;
+  
+    const response = await fetch('/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+  
+    if (response.ok) {
+      console.log('Registered successfully!');
+      
+    } else {
+      console.error('Failed to register!');
+    }
+  });
 
   shareButton.addEventListener('click', uploadImageFromClipboard);
 
@@ -105,6 +143,7 @@ document.addEventListener("paste", function (event) {
     }
   }
 });
+
 
 function downloadFile(url) {
   const link = document.createElement("a");
