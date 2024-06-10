@@ -28,6 +28,9 @@ app.post('/webhook', (req, res) => {
     res.status(200).send('Deployment script executed successfully.');
   });
 });
+app.get("/webhook",(req,res)=>{
+  res.status(200).send('This is a webhook for github deployment.');
+})
 
 app.get("/upload", async (req, res) => {
   try {
