@@ -10,21 +10,25 @@ const server = http.createServer(app);
 const io = socketIo(server);
 const bodyParser = require("body-parser");
 const { exec } = require("child_process");
-const session = require("express-session");
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("./DB/database.sqlite");
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const session = require("express-session");
+require("dotenv").config();
 
 app.use(express.json());
 app.use(express.static("public"));
-/* app.use(
+
+app.use(
   session({
     secret: process.env.DATABASE_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: true },
   })
-); */
+);
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/webhook", bodyParser.json({ verify: verifySignature }));
 
@@ -75,9 +79,38 @@ app.post("/register", (req, res) => {
       if (err) {
         return res.status(500).send("Error registering new user.");
       }
+      console.log("New user created.");
       res.status(200).send("User created successfully");
     }
   );
+});
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+
+  db.get("SELECT * FROM users WHERE username = ?", [username], (err, user) => {
+    if (err) {
+      return res.status(500).send("Error on the server.");
+    }
+    if (!user) {
+      return res.status(404).send("User not found.");
+    }
+
+    const passwordIsValid = bcrypt.compareSync(password, user.password);
+    if (!passwordIsValid) {
+      return res.status(401).send("Invalid password.");
+    }
+    const accessToken = jwt.sign(
+      {
+        user: {
+          username,
+        },
+      },
+      process.env.DATABASE_SECRET,
+      { expiresIn: "30m" }
+    );
+    req.session.user = user;
+    res.status(200).send({ message: "Login successful!", accessToken });
+  });
 });
 
 let currentClipboardData = "";
