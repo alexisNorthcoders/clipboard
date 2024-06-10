@@ -19,7 +19,7 @@ app.use('/webhook', bodyParser.json({ verify: verifySignature }));
 
 app.post('/webhook', (req, res) => {
   
-  exec('./deploy.sh', (error, stdout, stderr) => {
+  exec('./script/deploy.sh', (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return res.status(500).send(`Deployment script failed: ${stderr}`);
