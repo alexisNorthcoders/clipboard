@@ -17,6 +17,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/webhook", bodyParser.json({ verify: verifySignature }));
 
 app.post("/webhook", (req, res) => {
+  console.log("New deployment pushed to github. Clipboard restarting.")
   res.status(200).send("Deployment script is being executed.");
 
   exec("./script/deploy.sh", (error) => {
