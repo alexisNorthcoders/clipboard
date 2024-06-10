@@ -1,5 +1,7 @@
 const fs = require("fs").promises;
 const path = require("path");
+const crypto = require("crypto");
+const secret = process.env.SECRET;
 
 const getFileInformation = async (directory) => {
   const files = await fs.readdir(directory);
@@ -17,4 +19,13 @@ const getFileInformation = async (directory) => {
   );
   return fileInfos;
 };
-module.exports = {getFileInformation}
+function verifySignature(req, res, buf) {
+  const signature = `sha256=${crypto
+    .createHmac("sha256", secret)
+    .update(buf)
+    .digest("hex")}`;
+  if (req.headers["x-hub-signature-256"] !== signature) {
+    throw new Error("Invalid signature.");
+  }
+}
+module.exports = {getFileInformation,verifySignature}

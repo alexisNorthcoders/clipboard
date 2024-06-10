@@ -4,14 +4,13 @@ const socketIo = require("socket.io");
 const path = require("path");
 const fs = require("fs");
 const upload = require("./multer");
-const { getFileInformation } = require("./utils");
+const { getFileInformation, verifySignature } = require("./utils");
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const bodyParser = require("body-parser");
 const { exec } = require("child_process");
-const crypto = require("crypto");
-const secret = process.env.SECRET;
+
 app.use(express.json());
 app.use(express.static("public"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -78,15 +77,5 @@ io.on("connection", async (socket) => {
     console.log("A user disconnected");
   });
 });
-
-function verifySignature(req, res, buf) {
-  const signature = `sha256=${crypto
-    .createHmac("sha256", secret)
-    .update(buf)
-    .digest("hex")}`;
-  if (req.headers["x-hub-signature-256"] !== signature) {
-    throw new Error("Invalid signature.");
-  }
-}
 
 module.exports = { server, io };
