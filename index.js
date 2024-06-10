@@ -10,14 +10,26 @@ const server = http.createServer(app);
 const io = socketIo(server);
 const bodyParser = require("body-parser");
 const { exec } = require("child_process");
+const session = require("express-session");
+const sqlite3 = require("sqlite3").verbose();
+const db = new sqlite3.Database("./DB/database.sqlite");
+const bcrypt = require('bcryptjs');
 
 app.use(express.json());
 app.use(express.static("public"));
+/* app.use(
+  session({
+    secret: process.env.DATABASE_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true },
+  })
+); */
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/webhook", bodyParser.json({ verify: verifySignature }));
 
 app.post("/webhook", (req, res) => {
-  console.log("New deployment pushed to github. Clipboard restarting.")
+  console.log("New deployment pushed to github. Clipboard restarting.");
   res.status(200).send("Deployment script is being executed.");
 
   exec("./script/deploy.sh", (error) => {
@@ -27,9 +39,8 @@ app.post("/webhook", (req, res) => {
   });
 });
 app.get("/webhook", (req, res) => {
-  res.status(200).send("Making sure webhook is working correctly.");
+  res.status(400).send({ error: "You don't have access for this." });
 });
-
 app.get("/upload", async (req, res) => {
   try {
     const fileInfos = await getFileInformation(path.join(__dirname, "uploads"));
@@ -54,6 +65,20 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     res.status(500).send("Error getting file stats.");
   }
 });
+app.post("/register", (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 8);
+  db.run(
+    "INSERT INTO users (username, password) VALUES (?, ?)",
+    [username, hashedPassword],
+    (err) => {
+      if (err) {
+        return res.status(500).send("Error registering new user.");
+      }
+      res.status(200).send("User created successfully");
+    }
+  );
+});
 
 let currentClipboardData = "";
 
@@ -68,7 +93,6 @@ io.on("connection", async (socket) => {
   }
 
   socket.on("clipboard", (data) => {
-    console.log("Clipboard data received:", data);
     currentClipboardData = data;
 
     socket.broadcast.emit("clipboard", data);
