@@ -17,19 +17,18 @@ const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const { validateToken } = require("./middleware/tokenvalidator");
 require("dotenv").config();
+const sharedsession = require("express-socket.io-session");
+const { sessionMiddleware } = require("./middleware/sessionmiddleware");
 
 app.use(express.json());
 app.use(express.static("public"));
 
-app.use(
-  session({
-    secret: process.env.DATABASE_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false },
+app.use(sessionMiddleware);
+io.use(
+  sharedsession(sessionMiddleware, {
+    autoSave: true,
   })
 );
-
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/webhook", bodyParser.json({ verify: verifySignature }));
 
@@ -78,10 +77,10 @@ app.post("/register", (req, res) => {
     [username, hashedPassword],
     (err) => {
       if (err) {
-        return res.status(400).send({message:"Error registering new user."});
+        return res.status(400).send({ message: "Error registering new user." });
       }
       console.log("New user created.");
-      res.status(200).send({message:"User created successfully"});
+      res.status(200).send({ message: "User created successfully" });
     }
   );
 });
@@ -93,7 +92,7 @@ app.post("/login", (req, res) => {
       return res.status(500).send("Error on the server.");
     }
     if (!user) {
-      return res.status(404).send({message:"User not found."});
+      return res.status(404).send({ message: "User not found." });
     }
 
     const passwordIsValid = bcrypt.compareSync(password, user.password);
@@ -110,22 +109,26 @@ app.post("/login", (req, res) => {
       { expiresIn: "30m" }
     );
     req.session.user = user;
-    console.log("Session user set:", req.session.user);
-    res.status(200).send({ message: "Login successful!", accessToken });
+    req.session.save((err) => {
+      if (err) {
+        return res.status(500).send("Failed to save session.");
+      }
+      console.log("Session user set:", req.session.user);
+      res.status(200).send({ message: "Login successful!", accessToken });
+    });
   });
 });
-app.get("/current",validateToken,(req,res)=>{
-  res.send(req.user)
-})
+app.get("/current", validateToken, (req, res) => {
+  res.send(req.user);
+});
 app.post("/logout", (req, res) => {
-  console.log(req.session.user, "req.session.user")
+  console.log(req.session.user, "req.session.user");
   if (req.session.user) {
-    
-    req.session.destroy(err => {
+    req.session.destroy((err) => {
       if (err) {
         return res.status(500).send("Error in logging out.");
       }
-      
+
       res.status(200).send({ message: "Logout successful!" });
     });
   } else {
@@ -134,7 +137,9 @@ app.post("/logout", (req, res) => {
 });
 app.get("/test-session", (req, res) => {
   if (req.session.user) {
-    return res.status(200).send({ sessionData: req.session.user,message:"Test successfull!" });
+    return res
+      .status(200)
+      .send({ sessionData: req.session.user, message: "Test successfull!" });
   } else {
     return res.status(404).send({ message: "No session found." });
   }
@@ -142,24 +147,35 @@ app.get("/test-session", (req, res) => {
 let currentClipboardData = "";
 
 io.on("connection", async (socket) => {
-  console.log("A user connected");
-  socket.emit("clipboard", currentClipboardData);
-  try {
-    const fileInfos = await getFileInformation(path.join(__dirname, "uploads"));
-    socket.emit("filesUploaded", fileInfos);
-  } catch (err) {
-    console.error("Error getting file stats:", err);
+  if (socket.handshake.session.user) {
+    console.log(
+      "A user connected with a valid session:",
+      socket.handshake.session.user.username
+    );
+    console.log("A user connected");
+    socket.emit("clipboard", currentClipboardData);
+    try {
+      const fileInfos = await getFileInformation(
+        path.join(__dirname, "uploads")
+      );
+      socket.emit("filesUploaded", fileInfos);
+    } catch (err) {
+      console.error("Error getting file stats:", err);
+    }
+
+    socket.on("clipboard", (data) => {
+      currentClipboardData = data;
+
+      socket.broadcast.emit("clipboard", data);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("A user disconnected");
+    });
+  } else {
+    console.log("A user tried to connect without a valid session");
+    socket.disconnect(true);
   }
-
-  socket.on("clipboard", (data) => {
-    currentClipboardData = data;
-
-    socket.broadcast.emit("clipboard", data);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("A user disconnected");
-  });
 });
 
 module.exports = { server, io };
