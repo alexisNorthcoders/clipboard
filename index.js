@@ -4,15 +4,11 @@ const socketIo = require("socket.io");
 const path = require("path");
 const fs = require("fs");
 const upload = require("./multer");
-const { getFileInformation, verifySignature } = require("./utils");
+const { verifySignature } = require("./utils");
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const bodyParser = require("body-parser");
-const sqlite3 = require("sqlite3").verbose();
-const db = new sqlite3.Database("./DB/database.sqlite");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const { validateToken } = require("./middleware/tokenvalidator");
 require("dotenv").config();
 
@@ -37,41 +33,7 @@ app.get("/upload", uploadController.getUploads);
 app.post("/upload", upload.single("file"), (req, res) => uploadController.uploadFile(req, res, io));
 
 app.post("/register", userController.register);
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-
-  db.get("SELECT * FROM users WHERE username = ?", [username], (err, user) => {
-    if (err) {
-      return res.status(500).send("Error on the server.");
-    }
-    if (!user) {
-      return res.status(404).send({ message: "User not found." });
-    }
-
-    const passwordIsValid = bcrypt.compareSync(password, user.password);
-    if (!passwordIsValid) {
-      return res.status(401).send("Invalid password.");
-    }
-    const accessToken = jwt.sign(
-      {
-        user: {
-          username,
-        },
-      },
-      process.env.DATABASE_SECRET,
-      { expiresIn: "30m" }
-    );
-    req.session.user = user;
-    req.session.save((err) => {
-      if (err) {
-        return res.status(500).send("Failed to save session.");
-      }
-      console.log("Session user set:", req.session.user);
-
-      res.status(200).send({ message: "Login successful!", accessToken });
-    });
-  });
-});
+app.post("/login",userController.login);
 app.get("/current", validateToken, (req, res) => {
   res.send(req.user);
 });

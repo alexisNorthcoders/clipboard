@@ -29,7 +29,7 @@ class UserModel {
     db.run("INSERT INTO users (username, password) VALUES (?, ?)", [username, hashedPassword], callback);
   }
   findByUsername(username, callback) {
-    this.db.get("SELECT * FROM users WHERE username = ?", [username], callback);
+    db.get("SELECT * FROM users WHERE username = ?", [username], callback);
   }
 }
 

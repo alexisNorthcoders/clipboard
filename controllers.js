@@ -1,6 +1,7 @@
 const { webhookModel, uploadModel, userModel } = require("./models");
 const path = require("path");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 class WebhookController {
   getWebhook(req, res) {
@@ -57,6 +58,43 @@ class UserController {
       }
       console.log("New user created.");
       res.status(200).send({ message: "User created successfully" });
+    });
+  }
+  login(req, res) {
+    const { username, password } = req.body;
+
+    userModel.findByUsername(username, (err, user) => {
+      if (err) {
+        return res.status(500).send("Error on the server.");
+      }
+      if (!user) {
+        return res.status(404).send({ message: "User not found." });
+      }
+
+      const passwordIsValid = bcrypt.compareSync(password, user.password);
+      if (!passwordIsValid) {
+        return res.status(401).send("Invalid password.");
+      }
+
+      const accessToken = jwt.sign(
+        {
+          user: {
+            username,
+          },
+        },
+        process.env.DATABASE_SECRET,
+        { expiresIn: "30m" }
+      );
+
+      req.session.user = user;
+      req.session.save((err) => {
+        if (err) {
+          return res.status(500).send("Failed to save session.");
+        }
+        console.log("Session user set:", req.session.user);
+
+        res.status(200).send({ message: "Login successful!", accessToken });
+      });
     });
   }
 }
