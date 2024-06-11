@@ -36,6 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
           console.error("Error during logout:", error);
         });
     });
+    socket.on("connect", () => {
+      socket.emit("request_clipboard");
+    });
   }
 
   loginButton.addEventListener("click", async () => {
@@ -149,6 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Failed to copy text to clipboard: ", err);
     }
   });
+
   socket.on("clipboard", (data) => {
     if (data) {
       textarea.value = data;

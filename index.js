@@ -110,6 +110,7 @@ app.post("/login", (req, res) => {
         return res.status(500).send("Failed to save session.");
       }
       console.log("Session user set:", req.session.user);
+
       res.status(200).send({ message: "Login successful!", accessToken });
     });
   });
@@ -142,8 +143,6 @@ let currentClipboardData = "";
 
 io.on("connection", async (socket) => {
   if (socket.handshake.session.user) {
-    console.log("A user connected with a valid session:", socket.handshake.session.user.username);
-    console.log(socket.handshake.session);
     currentClipboardData = socket.handshake.session.clipboard || "";
     socket.emit("clipboard", currentClipboardData);
     try {
@@ -169,7 +168,18 @@ io.on("connection", async (socket) => {
         });
       });
     });
+    socket.on("request_clipboard", () => {
+      if (socket.handshake.session.user) {
+        const userId = socket.handshake.session.user.id;
+        const sockets = io.sockets.sockets;
 
+        sockets.forEach((connectedSocket) => {
+          if (connectedSocket.handshake.session.user && connectedSocket.handshake.session.user.id === userId && connectedSocket.handshake.session.clipboard) {
+            socket.emit("clipboard", connectedSocket.handshake.session.clipboard);
+          }
+        });
+      }
+    });
     socket.on("disconnect", () => {
       console.log("A user disconnected");
     });
