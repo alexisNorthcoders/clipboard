@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
       localStorage.setItem("accessToken", data.accessToken);
       authForms.style.display = "none";
+      window.location.reload();
     } else {
       console.error("Failed to log in!");
     }
@@ -149,7 +150,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
   socket.on("clipboard", (data) => {
-    textarea.value = data;
+    if (data) {
+      textarea.value = data;
+    } else {
+      textarea.value = "";
+      console.log("No clipboard data available for this session.");
+    }
   });
 
   socket.on("filesUploaded", (files) => {
