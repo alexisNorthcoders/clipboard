@@ -11,13 +11,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginButton = document.getElementById("loginButton");
   const registerButton = document.getElementById("registerButton");
   const authForms = document.getElementById("authForms");
+  const logoutButton = document.getElementById("logoutButton");
   
 
   const accessToken = localStorage.getItem("accessToken");
+  console.log(accessToken)
   if (!accessToken) {
-    authForms.style.display = "block";
+    logoutButton.style.display = "hidden";
   } else {
-    const logoutButton = document.getElementById("logoutButton");
+    authForms.style.display = "none";
     logoutButton.style.display = "block";
     logoutButton.addEventListener("click", () => {
       fetch("/logout", {
@@ -55,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Logged in successfully!");
       const data = await response.json();
       localStorage.setItem("accessToken", data.accessToken);
-      authForms.style.display = "none";
+      authForms.style.display = "hidden";
       window.location.reload();
     } else {
       console.error("Failed to log in!");

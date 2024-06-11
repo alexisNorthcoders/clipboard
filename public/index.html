@@ -9,37 +9,20 @@
     <script src="./index.js"></script>
   </head>
   <body class="font-mono bg-gray-100 justify-center">
-    <!-- login / register forms for smaller screens -->
-    <div class="lg:hidden fixed inset-0 bg-indigo-100 flex flex-col items-center">
-      <h1 class="text-5xl py-10 font-semibold ">Clipboard</h1>
-      <div>
-      <form id="loginForm" class="bg-white p-4 rounded-lg shadow-md w-full">
-        <input type="text" id="loginUsername" placeholder="Username" class="p-2 border rounded mb-2 w-full" />
-        <input type="password" id="loginPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full" />
-        <button id="loginButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full">Login</button>
+    <button id="logoutButton" hidden ><span class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">Logout</span></button>
+    <header id="authForms" class="fixed inset-0 lg:inset-auto bg-indigo-100 flex flex-col gap-4 lg:bg-indigo-700 lg:top-0 w-full shadow-md lg:flex-row lg:text-xs lg:px-2 items-center">
+     
+      <h1 class="text-5xl lg:hidden pt-5 font-semibold">Clipboard Sync</h1>
+      <form id="loginForm" class="bg-white lg:bg-transparent p-4 lg:p-0 rounded-lg shadow-md mt-4 lg:mt-2">
+        <input type="text" id="loginUsername" placeholder="Username" class="p-2 border rounded mb-2 w-full lg:w-auto" />
+        <input type="password" id="loginPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full lg:w-auto" />
+        <button id="loginButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full lg:w-auto">Login</button>
       </form>
 
-      <form id="registerForm" class="bg-white p-4 rounded-lg shadow-md mt-4 w-full">
-        <input type="text" id="registerUsername" placeholder="Username" class="p-2 border rounded mb-2 w-full" />
-        <input type="password" id="registerPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full" />
-        <button id="registerButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded w-full">Register</button>
-      </form>
-    </div>
-    </div>
-    <!--  -->
-    <header class="hidden lg:flex bg-indigo-700 fixed top-0 w-full shadow-md flex-row gap-4 text-xs px-2 items-center">
-      <button id="logoutButton" hidden><span class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">Logout</span></button>
-
-      <form id="loginForm" class="py-2">
-        <input type="text" id="loginUsername" placeholder="Username" class="p-2 rounded mb-2" />
-        <input type="password" id="loginPassword" placeholder="Password" class="p-2 rounded mb-2" />
-        <button id="loginButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Login</button>
-      </form>
-
-      <form id="registerForm" class="py-2">
-        <input type="text" id="registerUsername" placeholder="Username" class="p-2 border rounded mb-2" />
-        <input type="password" id="registerPassword" placeholder="Password" class="p-2 border rounded mb-2" />
-        <button id="registerButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Register</button>
+      <form id="registerForm" class="bg-white lg:bg-transparent p-4 lg:p-0 rounded-lg shadow-md mt-4 lg:mt-2">
+        <input type="text" id="registerUsername" placeholder="Username" class="p-2 border rounded mb-2 w-full lg:w-auto" />
+        <input type="password" id="registerPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full lg:w-auto" />
+        <button id="registerButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded w-full lg:w-auto">Register</button>
       </form>
     </header>
 
