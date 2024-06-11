@@ -62,7 +62,6 @@ class UserController {
   }
   login(req, res) {
     const { username, password } = req.body;
-
     userModel.findByUsername(username, (err, user) => {
       if (err) {
         return res.status(500).send("Error on the server.");
@@ -70,21 +69,11 @@ class UserController {
       if (!user) {
         return res.status(404).send({ message: "User not found." });
       }
-
       const passwordIsValid = bcrypt.compareSync(password, user.password);
       if (!passwordIsValid) {
         return res.status(401).send("Invalid password.");
       }
-
-      const accessToken = jwt.sign(
-        {
-          user: {
-            username,
-          },
-        },
-        process.env.DATABASE_SECRET,
-        { expiresIn: "30m" }
-      );
+      const accessToken = jwt.sign({ user: { username } }, process.env.DATABASE_SECRET, { expiresIn: "30m" });
 
       req.session.user = user;
       req.session.save((err) => {
@@ -96,6 +85,19 @@ class UserController {
         res.status(200).send({ message: "Login successful!", accessToken });
       });
     });
+  }
+  logout(req, res) {
+    if (req.session.user) {
+      req.session.destroy((err) => {
+        if (err) {
+          return res.status(500).send("Error in logging out.");
+        }
+
+        res.status(200).send({ message: "Logout successful!" });
+      });
+    } else {
+      res.status(200).send({ message: "No user session to terminate." });
+    }
   }
 }
 
