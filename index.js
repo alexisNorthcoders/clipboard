@@ -18,7 +18,7 @@ require("dotenv").config();
 
 const { sessionMiddleware } = require("./middleware/sessionmiddleware");
 const { setupWebsocket } = require("./websockets");
-const { webhookController, uploadController } = require("./controllers");
+const { webhookController, uploadController, userController } = require("./controllers");
 
 setupWebsocket(io, sessionMiddleware);
 
@@ -34,32 +34,9 @@ app.post("/webhook",webhookController.postWebhook);
 app.get("/webhook", webhookController.getWebhook);
 
 app.get("/upload", uploadController.getUploads);
-app.post("/upload", upload.single("file"), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
-  }
-  const fileUrl = `/uploads/${req.file.filename}`;
+app.post("/upload", upload.single("file"),(req,res)=> uploadController.uploadFile(req,res,io));
 
-  try {
-    const fileInfos = await getFileInformation(path.join(__dirname, "uploads"));
-    io.emit("filesUploaded", fileInfos);
-    res.status(201).json({ fileUrl, message: "File uploaded successfully" });
-  } catch (err) {
-    console.error("Error getting file stats:", err);
-    res.status(500).send("Error getting file stats.");
-  }
-});
-app.post("/register", (req, res) => {
-  const { username, password } = req.body;
-  const hashedPassword = bcrypt.hashSync(password, 8);
-  db.run("INSERT INTO users (username, password) VALUES (?, ?)", [username, hashedPassword], (err) => {
-    if (err) {
-      return res.status(400).send({ message: "Error registering new user." });
-    }
-    console.log("New user created.");
-    res.status(200).send({ message: "User created successfully" });
-  });
-});
+app.post("/register",userController.register);
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
@@ -120,4 +97,4 @@ app.get("/test-session", (req, res) => {
   }
 });
 
-module.exports = { server, io };
+module.exports = { server };

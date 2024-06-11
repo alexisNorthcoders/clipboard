@@ -1,5 +1,7 @@
 const { exec } = require("child_process");
 const { getFileInformation } = require("./utils");
+const sqlite3 = require("sqlite3").verbose();
+const db = new sqlite3.Database("./DB/database.sqlite");
 
 class WebhookModel {
   getAccessError() {
@@ -18,9 +20,18 @@ class UploadModel {
       throw err;
     }
   }
+  saveFile(file) {
+    return `/uploads/${file.filename}`;
+  }
+}
+class UserModel {
+  createUser(username, hashedPassword, callback) {
+    db.run("INSERT INTO users (username, password) VALUES (?, ?)", [username, hashedPassword], callback);
+  }
 }
 
 module.exports = {
   webhookModel: new WebhookModel(),
   uploadModel: new UploadModel(),
+  userModel: new UserModel(),
 };

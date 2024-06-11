@@ -1,5 +1,6 @@
-const { webhookModel, uploadModel } = require("./models");
+const { webhookModel, uploadModel, userModel } = require("./models");
 const path = require("path");
+const bcrypt = require("bcryptjs");
 
 class WebhookController {
   getWebhook(req, res) {
@@ -28,9 +29,40 @@ class UploadController {
       res.status(500).json({ error: "Error getting file stats" });
     }
   }
+  async uploadFile(req, res, io) {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+    const fileUrl = uploadModel.saveFile(req.file);
+
+    try {
+      const uploadFolderPath = path.join(__dirname, "uploads");
+      const fileInfos = await uploadModel.getFileInfo(uploadFolderPath);
+      io.emit("filesUploaded", fileInfos);
+      res.status(201).json({ fileUrl, message: "File uploaded successfully" });
+    } catch (err) {
+      console.error("Error getting file stats:", err);
+      res.status(500).send("Error getting file stats.");
+    }
+  }
+}
+class UserController {
+  register(req, res) {
+    const { username, password } = req.body;
+    const hashedPassword = bcrypt.hashSync(password, 8);
+
+    userModel.createUser(username, hashedPassword, (err) => {
+      if (err) {
+        return res.status(400).send({ message: "Error registering new user." });
+      }
+      console.log("New user created.");
+      res.status(200).send({ message: "User created successfully" });
+    });
+  }
 }
 
 module.exports = {
   webhookController: new WebhookController(),
   uploadController: new UploadController(),
+  userController: new UserController(),
 };
