@@ -4,7 +4,7 @@ const sessionMiddleware = session({
     secret: process.env.DATABASE_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: { secure: true },
   })
 
 module.exports = { sessionMiddleware };
