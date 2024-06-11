@@ -117,7 +117,7 @@ app.post("/login", (req, res) => {
 app.get("/current",validateToken,(req,res)=>{
   res.send(req.user)
 })
-app.post("/logout",validateToken, (req, res) => {
+app.post("/logout", (req, res) => {
   console.log(req.session.user, "req.session.user")
   if (req.session.user) {
     
