@@ -9,7 +9,6 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const bodyParser = require("body-parser");
-const { exec } = require("child_process");
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("./DB/database.sqlite");
 const bcrypt = require("bcryptjs");
@@ -19,7 +18,7 @@ require("dotenv").config();
 
 const { sessionMiddleware } = require("./middleware/sessionmiddleware");
 const { setupWebsocket } = require("./websockets");
-const { WebhookController } = require("./controllers");
+const { webhookController, uploadController } = require("./controllers");
 
 setupWebsocket(io, sessionMiddleware);
 
@@ -31,26 +30,10 @@ app.use(sessionMiddleware);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/webhook", bodyParser.json({ verify: verifySignature }));
 
-app.post("/webhook", (req, res) => {
-  console.log("New deployment pushed to github. Clipboard restarting.");
-  res.status(200).send("Deployment script is being executed.");
+app.post("/webhook",webhookController.postWebhook);
+app.get("/webhook", webhookController.getWebhook);
 
-  exec("./script/deploy.sh", (error) => {
-    if (error) {
-      console.error(`exec error: ${error}`);
-    }
-  });
-});
-app.get("/webhook", WebhookController.getWebhook);
-app.get("/upload", async (req, res) => {
-  try {
-    const fileInfos = await getFileInformation(path.join(__dirname, "uploads"));
-    res.json({ files: fileInfos });
-  } catch (err) {
-    console.error("Error getting file stats:", err);
-    res.status(500).json({ error: "Error getting file stats" });
-  }
-});
+app.get("/upload", uploadController.getUploads);
 app.post("/upload", upload.single("file"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
