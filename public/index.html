@@ -8,11 +8,11 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="./index.js"></script>
   </head>
-  <body class="font-mono bg-gray-100 justify-center">
-    <button id="logoutButton" hidden ><span class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">Logout</span></button>
-    <header id="authForms" class="fixed inset-0 lg:inset-auto bg-indigo-100 flex flex-col gap-4 lg:bg-indigo-700 lg:top-0 w-full shadow-md lg:flex-row lg:text-xs lg:px-2 items-center">
-     
+  <body class="font-mono bg-gray-100 justify-center m-0">
+   
+    <header id="authForms" class="hidden fixed inset-0 lg:inset-auto bg-indigo-100 flex flex-col gap-4 lg:bg-indigo-700 lg:top-0 w-full shadow-md lg:flex-row lg:text-xs lg:px-2 items-center">
       <h1 class="text-5xl lg:hidden pt-5 font-semibold">Clipboard Sync</h1>
+     
       <form id="loginForm" class="bg-white lg:bg-transparent p-4 lg:p-0 rounded-lg shadow-md mt-4 lg:mt-2">
         <input type="text" id="loginUsername" placeholder="Username" class="p-2 border rounded mb-2 w-full lg:w-auto" />
         <input type="password" id="loginPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full lg:w-auto" />
@@ -26,8 +26,9 @@
       </form>
     </header>
 
-    <div class="container mx-auto lg:pt-16 pt-0">
-      <h1 class="text-2xl font-bold mb-4">Clipboard Sync</h1>
+    <div class="container mx-auto lg:pt-12 pt-0">
+      <button id="logoutButton" class="text-sm bg-gray-500 hover:bg-gray-600 text-white font-bold p-1 rounded shadow-md" >Logout</button>
+      <h1 class="text-5xl mb-4">Clipboard Sync</h1> 
 
       <div class="w-full flex flex-row gap-2">
         <textarea id="clipboard" class="w-full p-4 border rounded" rows="10" cols="30"></textarea>

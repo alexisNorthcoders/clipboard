@@ -12,37 +12,36 @@ document.addEventListener("DOMContentLoaded", () => {
   const registerButton = document.getElementById("registerButton");
   const authForms = document.getElementById("authForms");
   const logoutButton = document.getElementById("logoutButton");
-  
 
   const accessToken = localStorage.getItem("accessToken");
-  console.log(accessToken)
+  console.log(accessToken);
   if (!accessToken) {
-    logoutButton.style.display = "hidden";
+    logoutButton.style.display = "none";
+    authForms.style.display = "flex";
   } else {
-    authForms.style.display = "none";
-    logoutButton.style.display = "block";
-    logoutButton.addEventListener("click", () => {
-      fetch("/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "same-origin",
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          localStorage.removeItem("accessToken");
-          window.location.reload();
-        })
-        .catch((error) => {
-          console.error("Error during logout:", error);
-        });
-    });
+    
+
     socket.on("connect", () => {
       socket.emit("request_clipboard");
     });
   }
-
+  logoutButton.addEventListener("click", () => {
+    fetch("/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "same-origin",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        localStorage.removeItem("accessToken");
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error("Error during logout:", error);
+      });
+  });
   loginButton.addEventListener("click", async () => {
     const username = document.getElementById("loginUsername").value;
     const password = document.getElementById("loginPassword").value;
@@ -57,12 +56,15 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Logged in successfully!");
       const data = await response.json();
       localStorage.setItem("accessToken", data.accessToken);
-      authForms.style.display = "hidden";
       window.location.reload();
     } else {
       console.error("Failed to log in!");
     }
   });
+
+  document.getElementById("registerForm").addEventListener("submit",  (e)=> e.preventDefault());
+  document.getElementById("loginForm").addEventListener("submit",  (e)=> e.preventDefault());
+
 
   registerButton.addEventListener("click", async () => {
     const username = document.getElementById("registerUsername").value;
