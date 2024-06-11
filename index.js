@@ -14,7 +14,6 @@ const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("./DB/database.sqlite");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const session = require("express-session");
 const { validateToken } = require("./middleware/tokenvalidator");
 require("dotenv").config();
 const sharedsession = require("express-socket.io-session");
