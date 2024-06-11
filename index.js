@@ -143,6 +143,7 @@ let currentClipboardData = "";
 io.on("connection", async (socket) => {
   if (socket.handshake.session.user) {
     console.log("A user connected with a valid session:", socket.handshake.session.user.username);
+    console.log(socket.handshake.session);
     currentClipboardData = socket.handshake.session.clipboard || "";
     socket.emit("clipboard", currentClipboardData);
     try {
@@ -157,9 +158,16 @@ io.on("connection", async (socket) => {
       socket.handshake.session.save((err) => {
         if (err) {
           console.error("Error saving session clipboard data:", err);
+          return;
         }
+        const currentUserId = socket.handshake.session.user;
+        const sockets = io.sockets.sockets;
+        sockets.forEach((connectedSocket) => {
+          if (connectedSocket.handshake.session.user.id === currentUserId.id) {
+            connectedSocket.emit("clipboard", data);
+          }
+        });
       });
-      socket.broadcast.emit("clipboard", data);
     });
 
     socket.on("disconnect", () => {
