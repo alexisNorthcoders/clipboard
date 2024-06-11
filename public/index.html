@@ -8,42 +8,60 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="./index.js"></script>
   </head>
-  <body class="bg-gray-100">
-    <button id="logoutButton" class="hidden"><span class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">Logout</span></button>
-    <div class="container mx-auto py-8">
-      <h1 class="text-2xl font-bold mb-4">Clipboard Sync</h1>
-      <div id="authForms" class="hidden">
-        <div id="loginForm" class="py-2">
-          <input type="text" id="loginUsername" placeholder="Username" class="p-2 border rounded mb-2" />
-          <input type="password" id="loginPassword" placeholder="Password" class="p-2 border rounded mb-2" />
-          <button id="loginButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Login</button>
-        </div>
+  <body class="font-mono bg-gray-100 justify-center">
+    <!-- login / register forms for smaller screens -->
+    <div class="lg:hidden fixed inset-0 bg-indigo-100 flex flex-col items-center">
+      <h1 class="text-5xl py-10 font-semibold ">Clipboard</h1>
+      <div>
+      <form id="loginForm" class="bg-white p-4 rounded-lg shadow-md w-full">
+        <input type="text" id="loginUsername" placeholder="Username" class="p-2 border rounded mb-2 w-full" />
+        <input type="password" id="loginPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full" />
+        <button id="loginButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full">Login</button>
+      </form>
 
-        <div id="registerForm" class="py-2">
-          <input type="text" id="registerUsername" placeholder="Username" class="p-2 border rounded mb-2" />
-          <input type="password" id="registerPassword" placeholder="Password" class="p-2 border rounded mb-2" />
-          <button id="registerButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Register</button>
-        </div>
-      </div>
+      <form id="registerForm" class="bg-white p-4 rounded-lg shadow-md mt-4 w-full">
+        <input type="text" id="registerUsername" placeholder="Username" class="p-2 border rounded mb-2 w-full" />
+        <input type="password" id="registerPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full" />
+        <button id="registerButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded w-full">Register</button>
+      </form>
+    </div>
+    </div>
+    <!--  -->
+    <header class="hidden lg:flex bg-indigo-700 fixed top-0 w-full shadow-md flex-row gap-4 text-xs px-2 items-center">
+      <button id="logoutButton" hidden><span class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">Logout</span></button>
+
+      <form id="loginForm" class="py-2">
+        <input type="text" id="loginUsername" placeholder="Username" class="p-2 rounded mb-2" />
+        <input type="password" id="loginPassword" placeholder="Password" class="p-2 rounded mb-2" />
+        <button id="loginButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Login</button>
+      </form>
+
+      <form id="registerForm" class="py-2">
+        <input type="text" id="registerUsername" placeholder="Username" class="p-2 border rounded mb-2" />
+        <input type="password" id="registerPassword" placeholder="Password" class="p-2 border rounded mb-2" />
+        <button id="registerButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Register</button>
+      </form>
+    </header>
+
+    <div class="container mx-auto lg:pt-16 pt-0">
+      <h1 class="text-2xl font-bold mb-4">Clipboard Sync</h1>
+
       <div class="w-full flex flex-row gap-2">
-        <textarea id="clipboard" class="w-1/2 p-2 border rounded" rows="10" cols="30"></textarea>
-        <div class="w-1/2 flex flex-col gap-2">
-          <h1 class="font-semibold">Preview clipboard image</h1>
-          <div class="w-full h-full border-4 border-gray-500 rounded-md" id="imageContainer"></div>
-          <button id="shareImage" class="w-20 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Share</button>
-        </div>
+        <textarea id="clipboard" class="w-full p-4 border rounded" rows="10" cols="30"></textarea>
       </div>
-      <button id="pasteClipboard" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4">Paste</button>
       <button id="copyClipboard" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4">Copy</button>
+      <button id="pasteClipboard" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4">Paste</button>
       <button id="clearClipboard" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mt-4">Clear</button>
       <div class="py-2">
         <input type="file" id="file" class="mb-4" />
         <button id="uploadFile" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Upload File</button>
       </div>
-
+      <div class="w-full h-44 flex flex-col gap-2">
+        <h1 class="font-semibold">Preview clipboard image</h1>
+        <div class="w-full h-full border-4 border-gray-500 rounded-md" id="imageContainer"></div>
+        <button id="shareImage" class="w-20 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Share</button>
+      </div>
       <div id="filesList" class="w-full mt-8 p-2 flex flex-col gap-1 bg-gray-200 rounded-lg"></div>
     </div>
-
-    <button id="test-session" class="px-10 py-2 bg-red-600">Test session live</button>
   </body>
 </html>

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginButton = document.getElementById("loginButton");
   const registerButton = document.getElementById("registerButton");
   const authForms = document.getElementById("authForms");
-  const testButton = document.getElementById("test-session");
+  
 
   const accessToken = localStorage.getItem("accessToken");
   if (!accessToken) {
@@ -59,19 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.reload();
     } else {
       console.error("Failed to log in!");
-    }
-  });
-  testButton.addEventListener("click", async () => {
-    const response = await fetch("/test-session", {
-      method: "GET",
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log(data);
-    } else {
-      const data = await response.json();
-      console.error("Test failed!", data.message);
     }
   });
 

@@ -32,7 +32,7 @@ class UserModel {
     db.get("SELECT * FROM users WHERE username = ?", [username], callback);
   }
   allUsers(callback){
-    db.all("SELECT * FROM users", [], callback);
+    db.all("SELECT id, username FROM users", [], callback);
   }
 }
 
