@@ -19,10 +19,10 @@ require("dotenv").config();
 
 const { sessionMiddleware } = require("./middleware/sessionmiddleware");
 const { setupWebsocket } = require("./websockets");
-
-
+const { WebhookController } = require("./controllers");
 
 setupWebsocket(io, sessionMiddleware);
+
 app.use(express.json());
 app.use(express.static("public"));
 
@@ -41,9 +41,7 @@ app.post("/webhook", (req, res) => {
     }
   });
 });
-app.get("/webhook", (req, res) => {
-  res.status(400).send({ error: "You don't have access for this." });
-});
+app.get("/webhook", WebhookController.getWebhook);
 app.get("/upload", async (req, res) => {
   try {
     const fileInfos = await getFileInformation(path.join(__dirname, "uploads"));
@@ -118,7 +116,7 @@ app.get("/current", validateToken, (req, res) => {
   res.send(req.user);
 });
 app.post("/logout", (req, res) => {
-  console.log(req.session.user, "req.session.user");
+  
   if (req.session.user) {
     req.session.destroy((err) => {
       if (err) {
@@ -138,8 +136,5 @@ app.get("/test-session", (req, res) => {
     return res.status(404).send({ message: "No session found." });
   }
 });
-
-
-
 
 module.exports = { server, io };
