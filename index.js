@@ -72,17 +72,13 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 app.post("/register", (req, res) => {
   const { username, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 8);
-  db.run(
-    "INSERT INTO users (username, password) VALUES (?, ?)",
-    [username, hashedPassword],
-    (err) => {
-      if (err) {
-        return res.status(400).send({ message: "Error registering new user." });
-      }
-      console.log("New user created.");
-      res.status(200).send({ message: "User created successfully" });
+  db.run("INSERT INTO users (username, password) VALUES (?, ?)", [username, hashedPassword], (err) => {
+    if (err) {
+      return res.status(400).send({ message: "Error registering new user." });
     }
-  );
+    console.log("New user created.");
+    res.status(200).send({ message: "User created successfully" });
+  });
 });
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
@@ -137,9 +133,7 @@ app.post("/logout", (req, res) => {
 });
 app.get("/test-session", (req, res) => {
   if (req.session.user) {
-    return res
-      .status(200)
-      .send({ sessionData: req.session.user, message: "Test successfull!" });
+    return res.status(200).send({ sessionData: req.session.user, message: "Test successfull!" });
   } else {
     return res.status(404).send({ message: "No session found." });
   }
@@ -148,24 +142,23 @@ let currentClipboardData = "";
 
 io.on("connection", async (socket) => {
   if (socket.handshake.session.user) {
-    console.log(
-      "A user connected with a valid session:",
-      socket.handshake.session.user.username
-    );
-    console.log("A user connected");
+    console.log("A user connected with a valid session:", socket.handshake.session.user.username);
+    currentClipboardData = socket.handshake.session.clipboard || "";
     socket.emit("clipboard", currentClipboardData);
     try {
-      const fileInfos = await getFileInformation(
-        path.join(__dirname, "uploads")
-      );
+      const fileInfos = await getFileInformation(path.join(__dirname, "uploads"));
       socket.emit("filesUploaded", fileInfos);
     } catch (err) {
       console.error("Error getting file stats:", err);
     }
 
     socket.on("clipboard", (data) => {
-      currentClipboardData = data;
-
+      socket.handshake.session.clipboard = data;
+      socket.handshake.session.save((err) => {
+        if (err) {
+          console.error("Error saving session clipboard data:", err);
+        }
+      });
       socket.broadcast.emit("clipboard", data);
     });
 

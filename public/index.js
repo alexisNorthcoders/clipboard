@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   testButton.addEventListener("click", async () => {
     const response = await fetch("/test-session", {
-      method: "GET"
+      method: "GET",
     });
 
     if (response.ok) {
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log(data);
     } else {
       const data = await response.json();
-      console.error("Test failed!",data.message);
+      console.error("Test failed!", data.message);
     }
   });
 
@@ -157,14 +157,8 @@ document.addEventListener("DOMContentLoaded", () => {
       .map(
         (file) => `
         <div class="flex flex-row items-center gap-1">
-          <button onclick="downloadFile('${
-            file.url
-          }')" class="px-4 py-1 bg-green-500 rounded text-white font-bold hover:bg-green-600">Download</button>
-          <a href="${
-            file.url
-          }" target="_blank" class="text-blue-800 font-bold hover:underline">${
-          file.name
-        }</a>
+          <button onclick="downloadFile('${file.url}')" class="px-4 py-1 bg-green-500 rounded text-white font-bold hover:bg-green-600">Download</button>
+          <a href="${file.url}" target="_blank" class="text-blue-800 font-bold hover:underline">${file.name}</a>
           <span>Size: ${(file.size / 1024).toFixed(2)} KB</span>
           <span>Created: ${new Date(file.created).toLocaleString()}</span>
           
@@ -175,8 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 document.addEventListener("paste", function (event) {
-  const items = (event.clipboardData || event.originalEvent.clipboardData)
-    .items;
+  const items = (event.clipboardData || event.originalEvent.clipboardData).items;
   for (const item of items) {
     if (item.type.indexOf("image") !== -1) {
       const blob = item.getAsFile();
@@ -218,11 +211,7 @@ function uploadImageFromClipboard() {
           if (type.startsWith("image")) {
             clipboardItem.getType(type).then((blob) => {
               const formData = new FormData();
-              formData.append(
-                "file",
-                blob,
-                `clipboard_image_${Date.now()}.png`
-              );
+              formData.append("file", blob, `clipboard_image_${Date.now()}.png`);
 
               fetch("/upload", {
                 method: "POST",
