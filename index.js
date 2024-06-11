@@ -35,6 +35,8 @@ app.post("/register", userController.register);
 app.post("/login", userController.login);
 app.post("/logout", userController.logout);
 
+app.get("/users",userController.getUsers)
+
 app.get("/current", validateToken, (req, res) => {
   res.send(req.user);
 });

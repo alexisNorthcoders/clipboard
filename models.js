@@ -31,7 +31,7 @@ class UserModel {
   findByUsername(username, callback) {
     db.get("SELECT * FROM users WHERE username = ?", [username], callback);
   }
-  allUsers(){
+  allUsers(callback){
     db.all("SELECT * FROM users", [], callback);
   }
 }

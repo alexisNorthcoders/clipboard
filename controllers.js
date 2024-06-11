@@ -99,6 +99,15 @@ class UserController {
       res.status(200).send({ message: "No user session to terminate." });
     }
   }
+  getUsers(req, res) {
+    userModel.allUsers((err, users) => {
+      if (err) {
+        console.log(err);
+        return res.status(400).send({ message: "Error getting list of users." });
+      }
+      res.status(200).send({ users });
+    });
+  }
 }
 
 module.exports = {
