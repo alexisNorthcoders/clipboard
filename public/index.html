@@ -9,8 +9,26 @@
     <script src="./index.js"></script>
   </head>
   <body class="bg-gray-100">
+    <button id="logoutButton" class="hidden"><span class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">Logout</span></button>
     <div class="container mx-auto py-8">
       <h1 class="text-2xl font-bold mb-4">Clipboard Sync</h1>
+      <div id="authForms" class="hidden">
+        <div id="loginForm" class="py-2">
+         
+          <input type="text" id="loginUsername" placeholder="Username" class="p-2 border rounded mb-2" />
+          <input type="password" id="loginPassword" placeholder="Password" class="p-2 border rounded mb-2" />
+          <button id="loginButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Login</button>
+        </div>
+        
+        
+        <div id="registerForm" class="py-2">
+         
+          <input type="text" id="registerUsername" placeholder="Username" class="p-2 border rounded mb-2" />
+          <input type="password" id="registerPassword" placeholder="Password" class="p-2 border rounded mb-2" />
+          <button id="registerButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Register</button>
+        </div>
+      
+      </div>
       <div class="w-full flex flex-row gap-2">
         <textarea id="clipboard" class="w-1/2 p-2 border rounded" rows="10" cols="30"></textarea>
         <div class="w-1/2 flex flex-col gap-2">
@@ -30,24 +48,7 @@
     
       <div id="filesList" class="w-full mt-8 p-2 flex flex-col gap-1 bg-gray-200 rounded-lg"></div>
     </div>
-    
-<div id="loginForm" class="container mx-auto py-8">
-  <h2 class="text-xl font-bold mb-4">Login</h2>
-  <input type="text" id="loginUsername" placeholder="Username" class="p-2 border rounded mb-2" />
-  <input type="password" id="loginPassword" placeholder="Password" class="p-2 border rounded mb-2" />
-  <button id="loginButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Login</button>
-</div>
+   
 
-
-<div id="registerForm" class="container mx-auto py-8">
-  <h2 class="text-xl font-bold mb-4">Register</h2>
-  <input type="text" id="registerUsername" placeholder="Username" class="p-2 border rounded mb-2" />
-  <input type="password" id="registerPassword" placeholder="Password" class="p-2 border rounded mb-2" />
-  <button id="registerButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Register</button>
-</div>
-<div id="registerForm" class="container mx-auto py-8">
-  
-  <button id="currentButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Current User</button>
-</div>
   </body>
 </html>
