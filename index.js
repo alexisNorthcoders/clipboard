@@ -26,7 +26,7 @@ app.use(
     secret: process.env.DATABASE_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true },
+    cookie: { secure: false },
   })
 );
 
@@ -110,13 +110,35 @@ app.post("/login", (req, res) => {
       { expiresIn: "30m" }
     );
     req.session.user = user;
+    console.log("Session user set:", req.session.user);
     res.status(200).send({ message: "Login successful!", accessToken });
   });
 });
 app.get("/current",validateToken,(req,res)=>{
   res.send(req.user)
 })
-
+app.post("/logout",validateToken, (req, res) => {
+  console.log(req.session.user, "req.session.user")
+  if (req.session.user) {
+    
+    req.session.destroy(err => {
+      if (err) {
+        return res.status(500).send("Error in logging out.");
+      }
+      
+      res.status(200).send({ message: "Logout successful!" });
+    });
+  } else {
+    res.status(200).send({ message: "No user session to terminate." });
+  }
+});
+app.get("/test-session", (req, res) => {
+  if (req.session.user) {
+    return res.status(200).send({ sessionData: req.session.user,message:"Test successfull!" });
+  } else {
+    return res.status(404).send({ message: "No session found." });
+  }
+});
 let currentClipboardData = "";
 
 io.on("connection", async (socket) => {

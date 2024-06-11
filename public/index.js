@@ -7,63 +7,88 @@ document.addEventListener("DOMContentLoaded", () => {
   const copyButton = document.getElementById("copyClipboard");
   const clearButton = document.getElementById("clearClipboard");
   const filesListDiv = document.getElementById("filesList");
-  const shareButton = document.getElementById('shareImage');
-  const loginButton = document.getElementById('loginButton')
-  const registerButton = document.getElementById('registerButton')
-  const authForms = document.getElementById('authForms')
-  
-  const accessToken = localStorage.getItem('accessToken')
-  if (!accessToken) {
-    authForms.style.display = 'block';
-  } else {
+  const shareButton = document.getElementById("shareImage");
+  const loginButton = document.getElementById("loginButton");
+  const registerButton = document.getElementById("registerButton");
+  const authForms = document.getElementById("authForms");
+  const testButton = document.getElementById("test-session");
 
-    const logoutButton = document.getElementById('logoutButton');
-    logoutButton.style.display = 'block';
-    logoutButton.addEventListener('click', function() {
-      localStorage.removeItem('accessToken');
-      window.location.reload();
+  const accessToken = localStorage.getItem("accessToken");
+  if (!accessToken) {
+    authForms.style.display = "block";
+  } else {
+    const logoutButton = document.getElementById("logoutButton");
+    logoutButton.style.display = "block";
+    logoutButton.addEventListener("click", () => {
+      fetch("/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "same-origin",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          localStorage.removeItem("accessToken");
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error during logout:", error);
+        });
     });
   }
 
-  loginButton.addEventListener('click', async () => {
-    const username = document.getElementById('loginUsername').value;
-    const password = document.getElementById('loginPassword').value;
-  
-    const response = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+  loginButton.addEventListener("click", async () => {
+    const username = document.getElementById("loginUsername").value;
+    const password = document.getElementById("loginPassword").value;
+
+    const response = await fetch("/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
     });
-  
+
     if (response.ok) {
-      console.log('Logged in successfully!');
+      console.log("Logged in successfully!");
       const data = await response.json();
-      localStorage.setItem('accessToken', data.accessToken);
-      console.log(data.accessToken)
+      localStorage.setItem("accessToken", data.accessToken);
+      authForms.style.display = "none";
     } else {
-      console.error('Failed to log in!');
+      console.error("Failed to log in!");
     }
   });
-  
-  registerButton.addEventListener('click', async () => {
-    const username = document.getElementById('registerUsername').value;
-    const password = document.getElementById('registerPassword').value;
-  
-    const response = await fetch('/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+  testButton.addEventListener("click", async () => {
+    const response = await fetch("/test-session", {
+      method: "GET"
     });
-  
+
     if (response.ok) {
-      console.log('Registered successfully!');
-      
+      const data = await response.json();
+      console.log(data);
     } else {
-      console.error('Failed to register!');
+      const data = await response.json();
+      console.error("Test failed!",data.message);
     }
   });
 
-  shareButton.addEventListener('click', uploadImageFromClipboard);
+  registerButton.addEventListener("click", async () => {
+    const username = document.getElementById("registerUsername").value;
+    const password = document.getElementById("registerPassword").value;
+
+    const response = await fetch("/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    if (response.ok) {
+      console.log("Registered successfully!");
+    } else {
+      console.error("Failed to register!");
+    }
+  });
+
+  shareButton.addEventListener("click", uploadImageFromClipboard);
 
   textarea.addEventListener("input", () => {
     socket.emit("clipboard", textarea.value);
@@ -160,7 +185,6 @@ document.addEventListener("paste", function (event) {
   }
 });
 
-
 function downloadFile(url) {
   const link = document.createElement("a");
   link.href = url;
@@ -186,35 +210,40 @@ function displayImage(blob) {
   reader.readAsDataURL(blob);
 }
 function uploadImageFromClipboard() {
-    navigator.clipboard.read().then(data => {
-      data.forEach(clipboardItem => {
-        clipboardItem.types.forEach(type => {
-          if (type.startsWith('image')) {
-            clipboardItem.getType(type).then(blob => {
-                
+  navigator.clipboard
+    .read()
+    .then((data) => {
+      data.forEach((clipboardItem) => {
+        clipboardItem.types.forEach((type) => {
+          if (type.startsWith("image")) {
+            clipboardItem.getType(type).then((blob) => {
               const formData = new FormData();
-              formData.append('file', blob, `clipboard_image_${Date.now()}.png`);
+              formData.append(
+                "file",
+                blob,
+                `clipboard_image_${Date.now()}.png`
+              );
 
-              fetch('/upload', {
-                method: 'POST',
-                body: formData
+              fetch("/upload", {
+                method: "POST",
+                body: formData,
               })
-              .then(response => {
-                if (response.ok) {
-                  console.log('Image uploaded successfully');
-                } else {
-                  console.error('Failed to upload image');
-                }
-              })
-              .catch(error => {
-                console.error('Error uploading image:', error);
-              });
+                .then((response) => {
+                  if (response.ok) {
+                    console.log("Image uploaded successfully");
+                  } else {
+                    console.error("Failed to upload image");
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error uploading image:", error);
+                });
             });
           }
         });
       });
     })
-    .catch(error => {
-      console.error('Error reading clipboard data:', error);
+    .catch((error) => {
+      console.error("Error reading clipboard data:", error);
     });
-  }
+}
