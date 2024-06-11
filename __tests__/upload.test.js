@@ -2,6 +2,7 @@ const request = require("supertest");
 const fs = require("fs");
 const path = require("path");
 const { server } = require("../index");
+const { initializeDatabase } = require("../databaseManager");
 
 describe("Server", () => {
   it("should return status code 200", async () => {
@@ -14,9 +15,7 @@ describe("POST /upload", () => {
     const sampleFilePath = path.join(__dirname, "sample.txt");
     fs.writeFileSync(sampleFilePath, "Sample text file content");
 
-    const response = await request(server)
-      .post("/upload")
-      .attach("file", sampleFilePath);
+    const response = await request(server).post("/upload").attach("file", sampleFilePath);
 
     expect(response.status).toBe(201);
     fs.unlinkSync(sampleFilePath);
@@ -25,14 +24,10 @@ describe("POST /upload", () => {
     const sampleFilePath = path.join(__dirname, "sample.txt");
     fs.writeFileSync(sampleFilePath, "Sample text file content");
 
-    const response = await request(server)
-      .post("/upload")
-      .attach("file", sampleFilePath);
+    const response = await request(server).post("/upload").attach("file", sampleFilePath);
 
     expect(response.status).toBe(201);
-    expect(response.body).toEqual(
-      expect.objectContaining({ message: "File uploaded successfully" })
-    );
+    expect(response.body).toEqual(expect.objectContaining({ message: "File uploaded successfully" }));
     expect(response.body.fileUrl).toBeDefined();
     fs.unlinkSync(sampleFilePath);
   });
@@ -79,6 +74,7 @@ describe("POST /register", () => {
     expect(response.body.message).toBe("Error registering new user.");
   });
 });
+
 describe("POST /login", () => {
   it("should error if User not found", async () => {
     const user = {
@@ -99,4 +95,7 @@ describe("POST /login", () => {
     expect(response.body.accessToken).toBeDefined();
     expect(response.status).toBe(200);
   });
+});
+afterAll(async () => {
+  await initializeDatabase();
 });
