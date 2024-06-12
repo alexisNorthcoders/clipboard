@@ -971,6 +971,11 @@ video {
   background-color: rgb(37 99 235 / var(--tw-bg-opacity));
 }
 
+.active\:file\:bg-blue-700::file-selector-button:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(29 78 216 / var(--tw-bg-opacity));
+}
+
 @media (min-width: 1024px) {
   .lg\:inset-auto {
     inset: auto;

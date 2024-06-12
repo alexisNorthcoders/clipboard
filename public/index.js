@@ -13,58 +13,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const authForms = document.getElementById("authForms");
   const logoutButton = document.getElementById("logoutButton");
 
-  const accessToken = localStorage.getItem("accessToken");
-  console.log(accessToken);
-  if (!accessToken) {
-    logoutButton.style.display = "none";
-    authForms.style.display = "flex";
-  } else {
-    
+  isUserLoggedIn(socket);
 
-    socket.on("connect", () => {
-      socket.emit("request_clipboard");
-    });
-  }
-  logoutButton.addEventListener("click", () => {
-    fetch("/logout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "same-origin",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        localStorage.removeItem("accessToken");
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error("Error during logout:", error);
-      });
-  });
-  loginButton.addEventListener("click", async () => {
-    const username = document.getElementById("loginUsername").value;
-    const password = document.getElementById("loginPassword").value;
+  logoutButton.addEventListener("click", () => logout(socket));
+  loginButton.addEventListener("click", () => login(socket));
 
-    const response = await fetch("/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-
-    if (response.ok) {
-      console.log("Logged in successfully!");
-      const data = await response.json();
-      localStorage.setItem("accessToken", data.accessToken);
-      window.location.reload();
-    } else {
-      console.error("Failed to log in!");
-    }
-  });
-
-  document.getElementById("registerForm").addEventListener("submit",  (e)=> e.preventDefault());
-  document.getElementById("loginForm").addEventListener("submit",  (e)=> e.preventDefault());
-
+  document.getElementById("registerForm").addEventListener("submit", (e) => e.preventDefault());
+  document.getElementById("loginForm").addEventListener("submit", (e) => e.preventDefault());
 
   registerButton.addEventListener("click", async () => {
     const username = document.getElementById("registerUsername").value;
@@ -118,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   pasteButton.addEventListener("click", async () => {
     try {
-      flashDivBackground(textarea,"green-100")
+      flashDivBackground(textarea, "green-100");
       const text = await navigator.clipboard.readText();
       textarea.value = text;
       socket.emit("clipboard", text);
@@ -129,10 +84,9 @@ document.addEventListener("DOMContentLoaded", () => {
   clearButton.addEventListener("click", async () => {
     try {
       const text = "";
-      flashDivBackground(textarea,"red-100")
+      flashDivBackground(textarea, "red-100");
       textarea.value = text;
       socket.emit("clipboard", text);
-     
     } catch (err) {
       console.error("Failed to read clipboard contents: ", err);
     }
@@ -142,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await navigator.clipboard.writeText(textarea.value);
       console.log("Text copied to clipboard:", textarea.value);
-      flashDivBackground(textarea,"blue-100")
+      flashDivBackground(textarea, "blue-100");
     } catch (err) {
       console.error("Failed to copy text to clipboard: ", err);
     }
