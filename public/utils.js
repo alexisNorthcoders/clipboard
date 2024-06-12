@@ -90,3 +90,61 @@ function initiateWebsocketConnection(socket) {
   });
   return socket
 }
+function downloadFile(url) {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = url.split("/").pop();
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+  function displayImage(blob) {
+    const reader = new FileReader();
+  
+    reader.onload = function (event) {
+      const imageUrl = event.target.result;
+  
+      const img = document.createElement("img");
+      img.src = imageUrl;
+  
+      const container = document.getElementById("imageContainer");
+      container.innerHTML = "";
+      container.appendChild(img);
+    };
+  
+    reader.readAsDataURL(blob);
+  }
+  function uploadImageFromClipboard() {
+    navigator.clipboard
+      .read()
+      .then((data) => {
+        data.forEach((clipboardItem) => {
+          clipboardItem.types.forEach((type) => {
+            if (type.startsWith("image")) {
+              clipboardItem.getType(type).then((blob) => {
+                const formData = new FormData();
+                formData.append("file", blob, `clipboard_image_${Date.now()}.png`);
+  
+                fetch("/upload", {
+                  method: "POST",
+                  body: formData,
+                })
+                  .then((response) => {
+                    if (response.ok) {
+                      console.log("Image uploaded successfully");
+                    } else {
+                      console.error("Failed to upload image");
+                    }
+                  })
+                  .catch((error) => {
+                    console.error("Error uploading image:", error);
+                  });
+              });
+            }
+          });
+        });
+      })
+      .catch((error) => {
+        console.error("Error reading clipboard data:", error);
+      });
+  }
