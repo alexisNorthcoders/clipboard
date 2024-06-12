@@ -12,7 +12,7 @@ class WebhookController {
     console.log("New deployment pushed to GitHub. Clipboard restarting.");
     res.status(200).send("Deployment script is being executed.");
 
-    webhookModel.executeDeploymentScript((error) => {
+    webhookModel.executeScript((error) => {
       if (error) {
         console.error(`exec error: ${error}`);
       }
