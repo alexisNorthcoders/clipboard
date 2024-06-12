@@ -12,7 +12,7 @@ class WebhookController {
     console.log("New deployment pushed to GitHub. Clipboard restarting.");
     res.status(200).send("Deployment script is being executed.");
 
-    WebhookModel.executeDeploymentScript((error) => {
+    webhookModel.executeDeploymentScript((error) => {
       if (error) {
         console.error(`exec error: ${error}`);
       }
@@ -39,8 +39,26 @@ class UploadController {
     try {
       const uploadFolderPath = path.join(__dirname, "uploads");
       const fileInfos = await uploadModel.getFileInfo(uploadFolderPath);
-      io.emit("filesUploaded", fileInfos);
-      res.status(201).json({ fileUrl, message: "File uploaded successfully" });
+      if (!req.session.files) {
+        req.session.files = [];
+      }
+      req.session.files.push({ name: req.file.originalname, url: fileUrl });
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session file data:", err);
+          return res.status(500).send("Error saving session data.");
+        }
+        const userId = req.session.user.id;
+        const sockets = io.sockets.sockets;
+        sockets.forEach((socket) => {
+          if (socket.handshake.session.user.id === userId) {
+            socket.emit("filesUploaded", req.session.files);
+            console.log("emitted these files: ",req.session.files)
+          }
+        });
+
+        res.status(201).json({ fileUrl, message: "File uploaded successfully" });
+      });
     } catch (err) {
       console.error("Error getting file stats:", err);
       res.status(500).send("Error getting file stats.");
