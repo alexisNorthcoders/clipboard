@@ -118,6 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   pasteButton.addEventListener("click", async () => {
     try {
+      flashDivBackground(textarea,"green-100")
       const text = await navigator.clipboard.readText();
       textarea.value = text;
       socket.emit("clipboard", text);
@@ -128,8 +129,10 @@ document.addEventListener("DOMContentLoaded", () => {
   clearButton.addEventListener("click", async () => {
     try {
       const text = "";
+      flashDivBackground(textarea,"red-100")
       textarea.value = text;
       socket.emit("clipboard", text);
+     
     } catch (err) {
       console.error("Failed to read clipboard contents: ", err);
     }
@@ -139,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await navigator.clipboard.writeText(textarea.value);
       console.log("Text copied to clipboard:", textarea.value);
+      flashDivBackground(textarea,"blue-100")
     } catch (err) {
       console.error("Failed to copy text to clipboard: ", err);
     }
@@ -158,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .map(
         (file) => `
         <div class="flex flex-row items-center gap-1">
-          <button onclick="downloadFile('${file.url}')" class="px-4 py-1 bg-green-500 rounded text-white font-bold hover:bg-green-600">Download</button>
+          <button onclick="downloadFile("${file.url}")" class="gap-2 items-center inline-flex px-4 py-1 bg-green-500 rounded text-white font-bold hover:bg-green-600"><img src="./assets/download.svg" class="h-6 w-6 brightness-0 invert"alt="download icon"><span class="hidden lg:block">Download</span></button>
           <a href="${file.url}" target="_blank" class="text-blue-800 font-bold hover:underline">${file.name}</a>
           <span>Size: ${(file.size / 1024).toFixed(2)} KB</span>
           <span>Created: ${new Date(file.created).toLocaleString()}</span>
