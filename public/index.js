@@ -1,5 +1,5 @@
+let socket = null;
 document.addEventListener("DOMContentLoaded", () => {
-  const socket = io();
   const textarea = document.getElementById("clipboard");
   const fileInput = document.getElementById("file");
   const uploadButton = document.getElementById("uploadFile");
@@ -13,10 +13,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const authForms = document.getElementById("authForms");
   const logoutButton = document.getElementById("logoutButton");
 
-  isUserLoggedIn(socket);
+  let isUserLoggedIn = checkUserLoggedIn();
 
+  if (isUserLoggedIn) {
+    socket = initiateWebsocketConnection(socket);
+  }
+
+  loginButton.addEventListener("click", () => login(socket).then((updatedSocket) => (socket = updatedSocket)));
   logoutButton.addEventListener("click", () => logout(socket));
-  loginButton.addEventListener("click", () => login(socket));
 
   document.getElementById("registerForm").addEventListener("submit", (e) => e.preventDefault());
   document.getElementById("loginForm").addEventListener("submit", (e) => e.preventDefault());
@@ -41,7 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
   shareButton.addEventListener("click", uploadImageFromClipboard);
 
   textarea.addEventListener("input", () => {
-    socket.emit("clipboard", textarea.value);
+    if (socket) {
+      socket.emit("clipboard", textarea.value);
+    } else {
+      console.log("Not connected.");
+    }
   });
 
   uploadButton.addEventListener("click", () => {
@@ -100,31 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error("Failed to copy text to clipboard: ", err);
     }
-  });
-
-  socket.on("clipboard", (data) => {
-    if (data) {
-      textarea.value = data;
-    } else {
-      textarea.value = "";
-      console.log("No clipboard data available for this session.");
-    }
-  });
-
-  socket.on("filesUploaded", (files) => {
-    filesListDiv.innerHTML = files
-      .map(
-        (file) => `
-        <div class="flex flex-row items-center gap-1">
-          <button onclick="downloadFile("${file.url}")" class="gap-2 items-center inline-flex px-4 py-1 bg-green-500 rounded text-white font-bold hover:bg-green-600"><img src="./assets/download.svg" class="h-6 w-6 brightness-0 invert"alt="download icon"><span class="hidden lg:block">Download</span></button>
-          <a href="${file.url}" target="_blank" class="text-blue-800 font-bold hover:underline">${file.name}</a>
-          <span>Size: ${(file.size / 1024).toFixed(2)} KB</span>
-          <span>Created: ${new Date(file.created).toLocaleString()}</span>
-          
-        </div>
-      `
-      )
-      .join("");
   });
 });
 document.addEventListener("paste", function (event) {
