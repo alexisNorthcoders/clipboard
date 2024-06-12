@@ -10,24 +10,24 @@
     <link href="styles.css" rel="stylesheet" />
   </head>
   <body class="font-mono bg-gray-100 justify-center m-0">
-    <header id="authForms" class="hidden fixed inset-0 lg:inset-auto bg-indigo-100 flex-col gap-4 lg:bg-indigo-700 lg:top-0 w-full shadow-md lg:flex-row lg:text-xs lg:px-2 items-center">
+    <header id="authForms" class="justify-center hidden fixed inset-0 z-10 lg:inset-auto bg-indigo-100 flex-col gap-4 lg:bg-indigo-700 lg:top-0 w-full shadow-md lg:flex-row lg:text-xs lg:px-2 items-center">
       <h1 class="text-5xl lg:hidden pt-5 font-semibold">Clipboard Sync</h1>
 
       <form id="loginForm" class="bg-white lg:bg-transparent p-4 lg:p-0 rounded-lg shadow-md mt-4 lg:mt-2">
         <input type="text" id="loginUsername" placeholder="Username" class="p-2 border rounded mb-2 w-full lg:w-auto" />
         <input type="password" id="loginPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full lg:w-auto" />
-        <button id="loginButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full lg:w-auto">Login</button>
+        <button id="loginButton" class="btn btn-blue w-full lg:w-auto">Login</button>
       </form>
 
       <form id="registerForm" class="bg-white lg:bg-transparent p-4 lg:p-0 rounded-lg shadow-md mt-4 lg:mt-2">
         <input type="text" id="registerUsername" placeholder="Username" class="p-2 border rounded mb-2 w-full lg:w-auto" />
         <input type="password" id="registerPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full lg:w-auto" />
-        <button id="registerButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded w-full lg:w-auto">Register</button>
+        <button id="registerButton" class="btn btn-green w-full lg:w-auto">Register</button>
       </form>
     </header>
 
     <div class="container mx-auto lg:pt-12 pt-0">
-      <button id="logoutButton" class="justify-center text-sm bg-gray-500 hover:bg-gray-600 active:bg-gray-700 hover:shadow-lg active:scale-95 duration-200 ease-in-out text-white font-bold p-1 rounded shadow-md">Logout</button>
+      <button id="logoutButton" class="btn btn-gray text-sm">Logout</button>
       <h1 class="text-5xl mb-4">Clipboard Sync</h1>
 
       <div class="w-full flex flex-row gap-2">
@@ -39,12 +39,12 @@
 
       <div class="flex flex-row items-center mt-2 gap-2">
         <input id="file" type="file" class="rounded shadow-inner file:py-2 file:px-3 file:border-0 file:rounded file:font-bold file:bg-blue-500 file:text-white hover:file:cursor-pointer hover:file:bg-blue-600" />
-        <button id="uploadFile" class="inline-flex bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded items-center justify-center gap-2"><img src="./assets/upload.svg" class="h-6 w-6" alt="upload icon" /><span class="hidden lg:block">Upload File</span></button>
+        <button id="uploadFile" class="inline-flex btn btn-blue gap-2"><img src="./assets/upload.svg" class="h-6 w-6" alt="upload icon" /><span class="hidden lg:block">Upload File</span></button>
       </div>
       <div class="w-full h-full flex flex-col gap-2">
         <h1 class="font-semibold">Preview clipboard image</h1>
         <div class="w-full h-full border-4 border-gray-500 rounded-md" id="imageContainer"></div>
-        <button id="shareImage" class="gap-2 items-center inline-flex bg-green-500 hover:bg-green-600 text-white font-bold py-2 w-fit px-2 rounded"><img src="./assets/share.svg" class="h-6 w-6 brightness-0 invert" alt="share icon" /><span class="hidden lg:block">Share</span></button>
+        <button id="shareImage" class="btn btn-green inline-flex gap-2 w-fit"><img src="./assets/share.svg" class="h-6 w-6 brightness-0 invert" alt="share icon" /><span class="hidden lg:block">Share</span></button>
       </div>
       <div id="filesList" class="w-full mt-8 p-2 flex flex-col gap-1 bg-gray-200 rounded-lg pb-10"></div>
     </div>
