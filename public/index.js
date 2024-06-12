@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const socket = io('wss://127.0.0.1:4123', { secure: true });
+  const socket = io();
   const textarea = document.getElementById("clipboard");
   const fileInput = document.getElementById("file");
   const uploadButton = document.getElementById("uploadFile");
