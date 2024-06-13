@@ -25,8 +25,15 @@ function logout(socket) {
     .then((response) => response.json())
     .then(() => {
       localStorage.removeItem("accessToken");
+      const textarea = document.getElementById("clipboard");
+      const filesListDiv = document.getElementById("filesList");
+      const container = document.getElementById("imageContainer");
+      container.innerHTML=""
+      filesListDiv.innerHTML = ""
+      textarea.value = ""
       logoutButton.style.display = "none";
       authForms.style.display = "flex";
+
       socket.disconnect();
     })
     .catch((error) => {
@@ -63,7 +70,7 @@ function initiateWebsocketConnection(socket) {
   socket.on("connect", () => {
     console.log("user connected");
     socket.emit("request_clipboard");
-    socket.emit("request_filelist")
+    socket.emit("request_filelist");
   });
   socket.on("clipboard", (data) => {
     if (data) {

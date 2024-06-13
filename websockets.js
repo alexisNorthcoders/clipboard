@@ -58,7 +58,7 @@ function setupWebsocket(io, sessionMiddleware) {
         if (socket.handshake.session.user) {
           const userId = socket.handshake.session.user.id;
           const sockets = io.sockets.sockets;
-          const filesList = userFilesMap.get(userId);
+          const filesList = userFilesMap.get(userId) || []
 
           sockets.forEach((socket) => {
             if (socket.handshake.session.user.id === userId) {
