@@ -2,6 +2,8 @@ const { exec } = require("child_process");
 const { getFileInformation } = require("./utils");
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("./DB/database.sqlite");
+const fs = require("fs").promises;
+const path = require("path");
 
 class WebhookModel {
   getAccessError() {
@@ -23,6 +25,18 @@ class UploadModel {
   saveFile(file) {
     return `/uploads/${file.filename}`;
   }
+  async deleteFile(filename) {
+    const filePath = path.join(__dirname, "uploads", filename);
+    try {
+      await fs.access(filePath);
+      await fs.unlink(filePath);
+
+      return `Successfully removed the file: ${filename}`;
+    } catch (err) {
+      console.error(`Error: ${err.message}`);
+      return err;
+    }
+  }
 }
 class UserModel {
   createUser(username, hashedPassword, callback) {
@@ -31,7 +45,7 @@ class UserModel {
   findByUsername(username, callback) {
     db.get("SELECT * FROM users WHERE username = ?", [username], callback);
   }
-  allUsers(callback){
+  allUsers(callback) {
     db.all("SELECT id, username FROM users", [], callback);
   }
 }

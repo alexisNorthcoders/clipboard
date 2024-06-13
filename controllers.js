@@ -35,8 +35,8 @@ class UploadController {
       return res.status(400).json({ error: "No file uploaded" });
     }
     const fileUrl = uploadModel.saveFile(req.file);
-    const size = req.file.size
-    const name = req.file.filename
+    const size = req.file.size;
+    const name = req.file.filename;
     res.status(201).json({ fileUrl, message: "File uploaded successfully" });
     console.log(req.file);
 
@@ -64,6 +64,15 @@ class UploadController {
       });
     } catch (err) {
       console.error("Error getting file stats:", err);
+    }
+  }
+  async removeFile(req, res) {
+    const { filename } = req.body;
+    try {
+      const response = await uploadModel.deleteFile(filename);
+      res.status(200).send({ message: response });
+    } catch (error) {
+      res.status(500).json({ error });
     }
   }
 }

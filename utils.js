@@ -20,12 +20,10 @@ const getFileInformation = async (directory) => {
   return fileInfos;
 };
 function verifySignature(req, res, buf) {
-  const signature = `sha256=${crypto
-    .createHmac("sha256", secret)
-    .update(buf)
-    .digest("hex")}`;
+  const signature = `sha256=${crypto.createHmac("sha256", secret).update(buf).digest("hex")}`;
   if (req.headers["x-hub-signature-256"] !== signature) {
     throw new Error("Invalid signature.");
   }
 }
-module.exports = {getFileInformation,verifySignature}
+
+module.exports = { getFileInformation, verifySignature };

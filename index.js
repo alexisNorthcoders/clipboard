@@ -37,6 +37,8 @@ app.post("/logout", userController.logout);
 
 app.get("/users", userController.getUsers);
 
+app.post("/delete", uploadController.removeFile);
+
 app.get("/current", validateToken, (req, res) => {
   res.send(req.user);
 });
