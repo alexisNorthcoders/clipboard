@@ -35,8 +35,11 @@ class UploadController {
       return res.status(400).json({ error: "No file uploaded" });
     }
     const fileUrl = uploadModel.saveFile(req.file);
-
+    res.status(201).json({ fileUrl, message: "File uploaded successfully" });
+    
+   
     try {
+      
       const userId = req.session.user.id;
       const newFile = { name: req.file.originalname, url: fileUrl, userId };
       const sockets = io.sockets.sockets;
@@ -49,7 +52,7 @@ class UploadController {
       req.session.save((err) => {
         if (err) {
           console.error("Error saving session file data:", err);
-          return res.status(500).send("Error saving session data.");
+         
         }
 
         sockets.forEach((socket) => {
@@ -59,11 +62,11 @@ class UploadController {
           }
         });
 
-        res.status(201).json({ fileUrl, message: "File uploaded successfully" });
+        
       });
     } catch (err) {
       console.error("Error getting file stats:", err);
-      res.status(500).send("Error getting file stats.");
+     
     }
   }
 }

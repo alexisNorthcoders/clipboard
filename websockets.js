@@ -1,5 +1,3 @@
-const { getFileInformation } = require("./utils");
-const path = require("path");
 const sharedsession = require("express-socket.io-session");
 const { userFilesMap } = require("./controllers");
 
