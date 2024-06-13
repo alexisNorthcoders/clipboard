@@ -15,14 +15,29 @@
 
       <form id="loginForm" class="bg-white lg:bg-transparent p-4 lg:p-0 rounded-lg shadow-md mt-4 lg:mt-2">
         <input type="text" id="loginUsername" placeholder="Username" class="p-2 border rounded mb-2 w-full lg:w-auto" />
-        <input type="password" id="loginPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full lg:w-auto" />
-        <button id="loginButton" class="btn btn-blue w-full lg:w-auto">Login</button>
+        <div class="relative inline-flex w-full lg:w-fit items-center">
+          <input type="password" id="loginPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full lg:w-auto pr-10" />
+
+          <span id="toggleLoginPassword" class="absolute inset-y-0 right-0 flex pr-2 cursor-pointer items-center pb-2">
+            <img id="showLogin" src="./assets/hide.svg" class="h-6 w-6" alt="copy icon" />
+            <img id="hideLogin" src="./assets/show.svg" hidden class="h-6 w-6" alt="copy icon" />
+          </span>
+        </div>
+        <button id="loginButton" class="btn btn-blue w-full lg:w-auto">Sign In</button>
       </form>
 
       <form id="registerForm" class="bg-white lg:bg-transparent p-4 lg:p-0 rounded-lg shadow-md mt-4 lg:mt-2">
         <input type="text" id="registerUsername" placeholder="Username" class="p-2 border rounded mb-2 w-full lg:w-auto" />
-        <input type="password" id="registerPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full lg:w-auto" />
-        <button id="registerButton" class="btn btn-green w-full lg:w-auto">Register</button>
+
+        <div class="relative inline-flex w-full lg:w-fit items-center">
+          <input type="password" id="registerPassword" placeholder="Password" class="p-2 border rounded mb-2 w-full lg:w-auto pr-10" />
+
+          <span id="toggleRegisterPassword" class="absolute inset-y-0 right-0 flex pr-2 cursor-pointer items-center pb-2">
+            <img id="showRegister" src="./assets/hide.svg" class="h-6 w-6" alt="copy icon" />
+            <img id="hideRegister" src="./assets/show.svg" hidden class="h-6 w-6" alt="copy icon" />
+          </span>
+        </div>
+        <button id="registerButton" class="btn btn-green w-full lg:w-auto">Sign Up</button>
       </form>
     </header>
 

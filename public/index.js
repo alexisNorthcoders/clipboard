@@ -12,6 +12,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const registerButton = document.getElementById("registerButton");
   const authForms = document.getElementById("authForms");
   const logoutButton = document.getElementById("logoutButton");
+  const passwordInput = document.getElementById("loginPassword");
+  const toggleLoginPassword = document.getElementById("toggleLoginPassword");
+  const toggleRegisterPassword = document.getElementById("toggleRegisterPassword");
+
+  toggleLoginPassword.addEventListener("click", () => {
+    toggle("loginPassword", "showLogin", "hideLogin");
+  });
+  toggleRegisterPassword.addEventListener("click", () => {
+    toggle("registerPassword", "showRegister", "hideRegister");
+  });
 
   let isUserLoggedIn = checkUserLoggedIn();
 

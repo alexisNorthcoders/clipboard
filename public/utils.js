@@ -50,7 +50,7 @@ async function login() {
     authForms.style.display = "none";
     logoutButton.style.display = "flex";
     socket = initiateWebsocketConnection(socket);
-    return socket
+    return socket;
   } else {
     console.error("Failed to log in!");
   }
@@ -80,69 +80,77 @@ function initiateWebsocketConnection(socket) {
           <div class="flex flex-row items-center gap-1">
             <button onclick="downloadFile(' ${file.url}')" class="btn btn-green inline-flex gap-2 w-fit"><img src="./assets/download.svg" class="h-6 w-6 brightness-0 invert" alt="download icon"/><span class="hidden lg:block">Download</span></button>
             <a href="${file.url}" target="_blank" class="text-blue-800 font-bold hover:underline overflow-text">${file.name}</a>
-            <span class="overflow-text">${(file.size / 1024).toFixed(0)}KB</span>
+            <span class="overflow-text">${(file.size / 1024).toFixed(2)}KB</span>
           </div>
         `
       )
       .join("");
   });
-  return socket
+  return socket;
 }
 function downloadFile(url) {
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = url.split("/").pop();
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-  function displayImage(blob) {
-    const reader = new FileReader();
-  
-    reader.onload = function (event) {
-      const imageUrl = event.target.result;
-  
-      const img = document.createElement("img");
-      img.src = imageUrl;
-  
-      const container = document.getElementById("imageContainer");
-      container.innerHTML = "";
-      container.appendChild(img);
-    };
-  
-    reader.readAsDataURL(blob);
-  }
-  function uploadImageFromClipboard() {
-    navigator.clipboard
-      .read()
-      .then((data) => {
-        data.forEach((clipboardItem) => {
-          clipboardItem.types.forEach((type) => {
-            if (type.startsWith("image")) {
-              clipboardItem.getType(type).then((blob) => {
-                const formData = new FormData();
-                formData.append("file", blob, `clipboard_image_${Date.now()}.png`);
-  
-                fetch("/upload", {
-                  method: "POST",
-                  body: formData,
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = url.split("/").pop();
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+function displayImage(blob) {
+  const reader = new FileReader();
+
+  reader.onload = function (event) {
+    const imageUrl = event.target.result;
+
+    const img = document.createElement("img");
+    img.src = imageUrl;
+
+    const container = document.getElementById("imageContainer");
+    container.innerHTML = "";
+    container.appendChild(img);
+  };
+
+  reader.readAsDataURL(blob);
+}
+function uploadImageFromClipboard() {
+  navigator.clipboard
+    .read()
+    .then((data) => {
+      data.forEach((clipboardItem) => {
+        clipboardItem.types.forEach((type) => {
+          if (type.startsWith("image")) {
+            clipboardItem.getType(type).then((blob) => {
+              const formData = new FormData();
+              formData.append("file", blob, `clipboard_image_${Date.now()}.png`);
+
+              fetch("/upload", {
+                method: "POST",
+                body: formData,
+              })
+                .then((response) => {
+                  if (response.ok) {
+                    console.log("Image uploaded successfully");
+                  } else {
+                    console.error("Failed to upload image");
+                  }
                 })
-                  .then((response) => {
-                    if (response.ok) {
-                      console.log("Image uploaded successfully");
-                    } else {
-                      console.error("Failed to upload image");
-                    }
-                  })
-                  .catch((error) => {
-                    console.error("Error uploading image:", error);
-                  });
-              });
-            }
-          });
+                .catch((error) => {
+                  console.error("Error uploading image:", error);
+                });
+            });
+          }
         });
-      })
-      .catch((error) => {
-        console.error("Error reading clipboard data:", error);
       });
-  }
+    })
+    .catch((error) => {
+      console.error("Error reading clipboard data:", error);
+    });
+}
+function toggle(passwordInputId, showElementId, hideElementId) {
+  const passwordInput = document.getElementById(passwordInputId);
+  const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+  passwordInput.setAttribute("type", type);
+
+  document.getElementById(showElementId).style.display = type === "password" ? "block" : "none";
+  document.getElementById(hideElementId).style.display = type === "password" ? "none" : "block";
+}
