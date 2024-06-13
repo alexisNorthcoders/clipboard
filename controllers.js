@@ -37,19 +37,19 @@ class UploadController {
     const fileUrl = uploadModel.saveFile(req.file);
 
     try {
-      const uploadFolderPath = path.join(__dirname, "uploads");
-      const fileInfos = await uploadModel.getFileInfo(uploadFolderPath);
+      
+      const userId = req.session.user.id;
+      const sockets = io.sockets.sockets;
       if (!req.session.files) {
         req.session.files = [];
       }
-      req.session.files.push({ name: req.file.originalname, url: fileUrl });
+      req.session.files.push({ name: req.file.originalname, url: fileUrl ,userId});
       req.session.save((err) => {
         if (err) {
           console.error("Error saving session file data:", err);
           return res.status(500).send("Error saving session data.");
         }
-        const userId = req.session.user.id;
-        const sockets = io.sockets.sockets;
+       
         sockets.forEach((socket) => {
           if (socket.handshake.session.user.id === userId) {
             socket.emit("filesUploaded", req.session.files);

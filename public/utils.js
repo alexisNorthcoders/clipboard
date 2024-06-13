@@ -63,6 +63,7 @@ function initiateWebsocketConnection(socket) {
   socket.on("connect", () => {
     console.log("user connected");
     socket.emit("request_clipboard");
+    socket.emit("request_filelist")
   });
   socket.on("clipboard", (data) => {
     if (data) {
