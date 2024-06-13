@@ -2,7 +2,7 @@ const { webhookModel, uploadModel, userModel } = require("./models");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const userFilesMap = new Map()
+const userFilesMap = new Map();
 class WebhookController {
   getWebhook(req, res) {
     const errorResponse = webhookModel.getAccessError();
@@ -35,13 +35,14 @@ class UploadController {
       return res.status(400).json({ error: "No file uploaded" });
     }
     const fileUrl = uploadModel.saveFile(req.file);
+    const size = req.file.size
+    const name = req.file.filename
     res.status(201).json({ fileUrl, message: "File uploaded successfully" });
-    
-   
+    console.log(req.file);
+
     try {
-      
       const userId = req.session.user.id;
-      const newFile = { name: req.file.originalname, url: fileUrl, userId };
+      const newFile = { name, url: fileUrl, userId, size };
       const sockets = io.sockets.sockets;
       if (!userFilesMap.has(userId)) {
         userFilesMap.set(userId, []);
@@ -52,7 +53,6 @@ class UploadController {
       req.session.save((err) => {
         if (err) {
           console.error("Error saving session file data:", err);
-         
         }
 
         sockets.forEach((socket) => {
@@ -61,12 +61,9 @@ class UploadController {
             console.log("emitted these files: ", req.session.files);
           }
         });
-
-        
       });
     } catch (err) {
       console.error("Error getting file stats:", err);
-     
     }
   }
 }
@@ -137,5 +134,5 @@ module.exports = {
   webhookController: new WebhookController(),
   uploadController: new UploadController(),
   userController: new UserController(),
-  userFilesMap
+  userFilesMap,
 };
