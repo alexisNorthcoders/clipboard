@@ -1,6 +1,7 @@
 const { getFileInformation } = require("./utils");
 const path = require("path");
 const sharedsession = require("express-socket.io-session");
+const { userFilesMap } = require("./controllers");
 
 function setupWebsocket(io, sessionMiddleware) {
   let currentClipboardData = "";
@@ -59,11 +60,11 @@ function setupWebsocket(io, sessionMiddleware) {
         if (socket.handshake.session.user) {
           const userId = socket.handshake.session.user.id;
           const sockets = io.sockets.sockets;
+          const filesList = userFilesMap.get(userId);
 
-          sockets.forEach((connectedSocket) => {
-            if (connectedSocket.handshake.session.user && connectedSocket.handshake.session.user.id === userId && connectedSocket.handshake.session.files) {
-              console.log("sent :", connectedSocket.handshake.session.files);
-              socket.emit("filesUploaded", connectedSocket.handshake.session.files);
+          sockets.forEach((socket) => {
+            if (socket.handshake.session.user.id === userId) {
+              socket.emit("filesUploaded", filesList);
             }
           });
         }
