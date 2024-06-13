@@ -29,6 +29,7 @@ module.exports = {
     "text-blue-800",
     "hover:underline",
     "w-fit",
+    "overflow-text",
 
     {
       pattern: /bg-(red|green|blue)-(100|200|300|400|500)/,

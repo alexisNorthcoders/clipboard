@@ -78,11 +78,9 @@ function initiateWebsocketConnection(socket) {
       .map(
         (file) => `
           <div class="flex flex-row items-center gap-1">
-            <button onclick="downloadFile("${file.url}")" class="btn btn-green inline-flex gap-2 w-fit"><img src="./assets/download.svg" class="h-6 w-6 brightness-0 invert"alt="download icon"><span class="hidden lg:block">Download</span></button>
+            <button onclick="downloadFile(' ${file.url}')" class="btn btn-green inline-flex gap-2 w-fit"><img src="./assets/download.svg" class="h-6 w-6 brightness-0 invert" alt="download icon"/><span class="hidden lg:block">Download</span></button>
             <a href="${file.url}" target="_blank" class="text-blue-800 font-bold hover:underline overflow-text">${file.name}</a>
-            <span class="overflow-text">Size: ${(file.size / 1024).toFixed(2)} KB</span>
-            <span class="overflow-text">Created: ${new Date(file.created).toLocaleString()}</span>
-            
+            <span class="overflow-text">${(file.size / 1024).toFixed(0)}KB</span>
           </div>
         `
       )
