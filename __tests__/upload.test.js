@@ -3,6 +3,8 @@ const fs = require("fs");
 const path = require("path");
 const { server } = require("../index");
 const { initializeDatabase } = require("../databaseManager");
+const { generateTestToken } = require("../middleware/tokenvalidator");
+
 
 describe("Server", () => {
   it("should return status code 200", async () => {
@@ -38,26 +40,24 @@ describe("POST /upload", () => {
   });
 });
 describe("POST /delete", () => {
+  const token = generateTestToken();
   it("should delete a file", async () => {
     const sampleFilePath = path.join(__dirname, "../uploads/sample.txt");
-    
     try {
-      
       fs.writeFileSync(sampleFilePath, "Sample text file content");
-      
     } catch (err) {
-      console.error('Error writing file:', err);
+      console.error("Error writing file:", err);
     }
-    
+
     const filename = "sample.txt";
-    const response = await request(server).post("/delete").send({ filename });
+    const response = await request(server).post("/delete").set('Authorization', `Bearer ${token}`).send({ filename });
 
     expect(response.status).toBe(200);
   });
 
   it("should error 404 if file not found", async () => {
     const filename = "Notfound.txt";
-    const response = await request(server).post("/delete").send({ filename });
+    const response = await request(server).post("/delete").set('Authorization', `Bearer ${token}`).send({ filename });
 
     expect(response.status).toBe(404);
   });
