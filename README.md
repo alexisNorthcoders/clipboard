@@ -7,7 +7,10 @@ Features auto-deployment script with Github webhook.
 
 
 TODO:
-- Functionality (websocket or post request) to remove files
+- Functionality (websocket or post request) to remove files 
+  - POST /delete - done
+  - Tests for endpoint and error handling
+  - Button to remove files in the client side
 - Automatically remove files 5 minutes after upload
 - Styling (better spacing and color theme)
 - Animated logo (Clipboard Sync logo)

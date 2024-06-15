@@ -37,6 +37,31 @@ describe("POST /upload", () => {
     expect(response.status).toBe(400);
   });
 });
+describe("POST /delete", () => {
+  it("should delete a file", async () => {
+    const uploadFolderPath = path.join(__dirname,"..","uploads");
+    const sampleFilePath = path.join(uploadFolderPath,"sample.txt")
+    try {
+      fs.writeFileSync(sampleFilePath, 'Sample content', 'utf8');
+      console.log('File was created successfully.');
+    } catch (err) {
+      console.error('Error writing the file:', err);
+    }
+ 
+    const filename = "sample.txt";
+    const response = await request(server).post("/delete").send({ filename });
+
+    expect(response.status).toBe(200);
+    
+  });
+ 
+  it("should error 404 if file not found", async () => {
+    const filename = "sample.txt";
+    const response = await request(server).post("/delete").send({ filename });
+
+    expect(response.status).toBe(404);
+  });
+});
 describe("GET /upload", () => {
   it('should return a list of files in the "uploads" folder', async () => {
     const response = await request(server).get("/upload");
