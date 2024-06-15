@@ -4,6 +4,7 @@ const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("./DB/database.sqlite");
 const fs = require("fs").promises;
 const path = require("path");
+const { userFilesMap } = require("./controllers");
 
 class WebhookModel {
   getAccessError() {
@@ -31,11 +32,13 @@ class UploadModel {
       await fs.access(filePath);
       await fs.unlink(filePath);
 
+
       return `Successfully removed the file: ${filename}`;
     } catch (err) {
       
       throw err;
     }
+    userFilesMap
   }
 }
 class UserModel {

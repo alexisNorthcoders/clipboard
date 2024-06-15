@@ -30,6 +30,7 @@ module.exports = {
     "hover:underline",
     "w-fit",
     "overflow-text",
+    "px-0",
 
     {
       pattern: /bg-(red|green|blue)-(100|200|300|400|500)/,

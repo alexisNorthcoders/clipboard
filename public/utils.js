@@ -28,9 +28,9 @@ function logout(socket) {
       const textarea = document.getElementById("clipboard");
       const filesListDiv = document.getElementById("filesList");
       const container = document.getElementById("imageContainer");
-      container.innerHTML=""
-      filesListDiv.innerHTML = ""
-      textarea.value = ""
+      container.innerHTML = "";
+      filesListDiv.innerHTML = "";
+      textarea.value = "";
       logoutButton.style.display = "none";
       authForms.style.display = "flex";
 
@@ -89,6 +89,7 @@ function initiateWebsocketConnection(socket) {
             <button onclick="downloadFile(' ${file.url}')" class="btn btn-green inline-flex gap-2 w-fit"><img src="./assets/download.svg" class="h-6 w-6 brightness-0 invert" alt="download icon"/><span class="hidden lg:block">Download</span></button>
             <a href="${file.url}" target="_blank" class="text-blue-800 font-bold hover:underline overflow-text">${file.name}</a>
             <span class="overflow-text">${(file.size / 1024).toFixed(2)}KB</span>
+            <button onclick="deleteFile(this,'${file.name}')" class="btn btn-red inline-flex gap-2 w-fit"><img src="./assets/delete.svg" class="h-6 w-6 brightness-0 invert" alt="download icon"/><span class="hidden lg:block">Delete</span></button>
           </div>
         `
       )
@@ -103,6 +104,23 @@ function downloadFile(url) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+async function deleteFile(button,filename) {
+  const response = await fetch("/delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename }),
+  });
+  if (response.ok) {
+    const data = await response.json()
+    console.log(data.message)
+    const fileDiv = button.parentNode;
+    if (fileDiv) {
+      fileDiv.remove();
+    }
+  } else {
+    console.log("failed to remove file");
+  }
 }
 function displayImage(blob) {
   const reader = new FileReader();

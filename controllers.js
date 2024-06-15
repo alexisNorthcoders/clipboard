@@ -67,6 +67,8 @@ class UploadController {
   }
   async removeFile(req, res) {
     const { filename } = req.body;
+    
+    
     try {
       const response = await uploadModel.deleteFile(filename);
       res.status(200).send({ message: response });
