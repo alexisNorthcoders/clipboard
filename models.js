@@ -33,8 +33,8 @@ class UploadModel {
 
       return `Successfully removed the file: ${filename}`;
     } catch (err) {
-      console.error(`Error: ${err.message}`);
-      return err;
+      
+      throw err;
     }
   }
 }

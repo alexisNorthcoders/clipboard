@@ -39,24 +39,24 @@ describe("POST /upload", () => {
 });
 describe("POST /delete", () => {
   it("should delete a file", async () => {
-    const uploadFolderPath = path.join(__dirname,"..","uploads");
-    const sampleFilePath = path.join(uploadFolderPath,"sample.txt")
+    const sampleFilePath = path.join(__dirname, "../uploads/sample.txt");
+    
     try {
-      fs.writeFileSync(sampleFilePath, 'Sample content', 'utf8');
-      console.log('File was created successfully.');
+      
+      fs.writeFileSync(sampleFilePath, "Sample text file content");
+      
     } catch (err) {
-      console.error('Error writing the file:', err);
+      console.error('Error writing file:', err);
     }
- 
+    
     const filename = "sample.txt";
     const response = await request(server).post("/delete").send({ filename });
 
     expect(response.status).toBe(200);
-    
   });
- 
+
   it("should error 404 if file not found", async () => {
-    const filename = "sample.txt";
+    const filename = "Notfound.txt";
     const response = await request(server).post("/delete").send({ filename });
 
     expect(response.status).toBe(404);

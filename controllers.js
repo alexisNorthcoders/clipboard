@@ -26,7 +26,6 @@ class UploadController {
       const fileInfos = await uploadModel.getFileInfo(uploadFolderPath);
       res.json({ files: fileInfos });
     } catch (err) {
-      console.error("Error getting file stats:", err);
       res.status(500).json({ error: "Error getting file stats" });
     }
   }
@@ -72,7 +71,11 @@ class UploadController {
       const response = await uploadModel.deleteFile(filename);
       res.status(200).send({ message: response });
     } catch (error) {
-      res.status(500).json({ error });
+      if (error.code === "ENOENT") {
+        res.status(404).json({ error: "File not found!" });
+      } else {
+        res.status(500).json({ error });
+      }
     }
   }
 }
