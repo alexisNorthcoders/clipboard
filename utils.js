@@ -25,5 +25,20 @@ function verifySignature(req, res, buf) {
     throw new Error("Invalid signature.");
   }
 }
+function removeFileFromMap(map,userId, filename) {
+  if (map.has(userId)) {
+    const fileList = map.get(userId);
 
-module.exports = { getFileInformation, verifySignature };
+    const fileIndex = fileList.findIndex((file) => file.name === filename);
+
+    if (fileIndex !== -1) {
+      fileList.splice(fileIndex, 1);
+
+      if (fileList.length === 0) {
+        map.delete(userId);
+      }
+    }
+  }
+}
+
+module.exports = { getFileInformation, verifySignature,removeFileFromMap };
