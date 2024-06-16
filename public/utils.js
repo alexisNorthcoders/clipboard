@@ -105,15 +105,19 @@ function downloadFile(url) {
   link.click();
   document.body.removeChild(link);
 }
-async function deleteFile(button,filename) {
+async function deleteFile(button, filename) {
+  const token = localStorage.getItem("accessToken");
   const response = await fetch("/delete", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+
     body: JSON.stringify({ filename }),
   });
   if (response.ok) {
-    const data = await response.json()
-    console.log(data.message)
+    
     const fileDiv = button.parentNode;
     if (fileDiv) {
       fileDiv.remove();

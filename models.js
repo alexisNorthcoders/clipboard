@@ -32,13 +32,10 @@ class UploadModel {
       await fs.access(filePath);
       await fs.unlink(filePath);
 
-
       return `Successfully removed the file: ${filename}`;
     } catch (err) {
-      
       throw err;
     }
-    userFilesMap
   }
 }
 class UserModel {

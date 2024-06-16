@@ -12,6 +12,8 @@ const validateToken = (req, res, next) => {
           throw new Error("User is not authorized");
         }
         req.user = decoded.user;
+        req.user.userId = decoded.userId;
+
         next();
       });
     } else {
@@ -23,7 +25,7 @@ const validateToken = (req, res, next) => {
   }
 };
 const generateTestToken = () => {
-  const user = { id: "testUser" }; 
+  const user = { id: "testUser" };
   return jwt.sign(user, process.env.DATABASE_SECRET, { expiresIn: "1h" });
 };
 module.exports = { validateToken, generateTestToken };

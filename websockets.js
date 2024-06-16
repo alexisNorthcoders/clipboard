@@ -12,19 +12,7 @@ function setupWebsocket(io, sessionMiddleware) {
     if (socket.handshake.session.user) {
       currentClipboardData = socket.handshake.session.clipboard || "";
       socket.emit("clipboard", currentClipboardData);
-      try {
-        const userId = socket.handshake.session.user.id;
-        const sockets = io.sockets.sockets;
-
-        sockets.forEach((connectedSocket) => {
-          if (connectedSocket.handshake.session.user && connectedSocket.handshake.session.user.id === userId && connectedSocket.handshake.session.files) {
-            socket.emit("filesUploaded", connectedSocket.handshake.session.files);
-          }
-        });
-      } catch (err) {
-        console.error("Error getting file stats:", err);
-      }
-
+      
       socket.on("clipboard", (data) => {
         socket.handshake.session.clipboard = data;
         socket.handshake.session.save((err) => {
@@ -59,6 +47,7 @@ function setupWebsocket(io, sessionMiddleware) {
           const userId = socket.handshake.session.user.id;
           const sockets = io.sockets.sockets;
           const filesList = userFilesMap.get(userId) || []
+          console.log(userFilesMap)
 
           sockets.forEach((socket) => {
             if (socket.handshake.session.user.id === userId) {

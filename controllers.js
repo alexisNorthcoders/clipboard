@@ -2,6 +2,7 @@ const { webhookModel, uploadModel, userModel } = require("./models");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { removeFileFromMap } = require("./utils");
 const userFilesMap = new Map();
 class WebhookController {
   getWebhook(req, res) {
@@ -37,7 +38,6 @@ class UploadController {
     const size = req.file.size;
     const name = req.file.filename;
     res.status(201).json({ fileUrl, message: "File uploaded successfully" });
-    console.log(req.file);
 
     try {
       const userId = req.session.user.id;
@@ -67,10 +67,11 @@ class UploadController {
   }
   async removeFile(req, res) {
     const { filename } = req.body;
-    
-    
+    const { userId } = req.user;
+
     try {
       const response = await uploadModel.deleteFile(filename);
+      removeFileFromMap(userFilesMap, userId, filename);
       res.status(200).send({ message: response });
     } catch (error) {
       if (error.code === "ENOENT") {
@@ -104,10 +105,12 @@ class UserController {
         return res.status(404).send({ message: "User not found." });
       }
       const passwordIsValid = bcrypt.compareSync(password, user.password);
+      const userId = user.id;
+      console.log(userId, "inside model");
       if (!passwordIsValid) {
         return res.status(401).send("Invalid password.");
       }
-      const accessToken = jwt.sign({ user: { username } }, process.env.DATABASE_SECRET, { expiresIn: "30m" });
+      const accessToken = jwt.sign({ user: { username }, userId }, process.env.DATABASE_SECRET, { expiresIn: "30m" });
 
       req.session.user = user;
       req.session.save((err) => {
