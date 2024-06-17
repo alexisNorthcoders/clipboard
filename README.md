@@ -1,6 +1,17 @@
 # clipboard
 Clipboard project to easily copy/paste text and share files/screenshots between different devices
 
+Key features:
+- **Web-Based Clipboard Synchronization**: Instantly copy/paste content across different devices through a browser-based interface.
+- **Image and File Preview**: Preview images, such as screenshots or shared photos, directly within the web app before sending.
+- **Comprehensive File Sharing**: Share a variety of file types securely.
+- **Quick and Easy Access**: No installation required; access the app directly from your web browser.
+- **Cross-Device Compatibility**: Effortlessly transfer clipboard contents between your phone, tablet, and laptop without native app restrictions.
+- **Secure User Authentication**: Utilizes an SQLite database to manage user login details with robust security.
+- **Intuitive User Experience**: Clean and simple interface featuring one-click actions to copy, paste, or clear the clipboard content.
+- **WebSocket Technology**: Real-time text sharing implemented with WebSocket communication.
+- **Automatic File Cleanup**: Files are automatically deleted from the clipboard for enhanced privacy and security.
+
 ![alt text](image-1.png)
 ![alt text](image-2.png)
 
