@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { removeFileFromMap } = require("./utils");
 const fileDeletionQueue = require("./deletionQueue");
+const { redisClient, getFilesForUser, addFileToUser } = require("./redis.js");
 const userFilesMap = new Map();
 
 class WebhookController {
@@ -45,6 +46,8 @@ class UploadController {
     try {
       const userId = req.session.user.id;
       const newFile = { name, url: fileUrl, userId, size };
+      await addFileToUser(redisClient,userId,newFile)
+
       const sockets = io.sockets.sockets;
       if (!userFilesMap.has(userId)) {
         userFilesMap.set(userId, []);
@@ -64,7 +67,7 @@ class UploadController {
           }
         });
       });
-      
+
       fileDeletionQueue.add(
         {
           filePath,
@@ -72,10 +75,10 @@ class UploadController {
           filename: req.file.filename,
         },
         {
-          delay: 5 * 1000,
+          delay: 120 * 1000,
         }
       );
-      } catch (err) {
+    } catch (err) {
       console.error("Error getting file stats:", err);
     }
   }

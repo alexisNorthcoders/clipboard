@@ -1,5 +1,4 @@
 const Queue = require("bull");
-const path = require("path");
 const fs = require("fs");
 const { removeFileFromMap } = require("./utils");
 
@@ -16,7 +15,7 @@ fileDeletionQueue.process(async (job) => {
     if (err) {
       console.error(`Error deleting file ${filePath}:`, err);
     } else {
-      console.log(`File ${filePath} deleted successfully after 5 seconds.`);
+      console.log(`File ${filePath} deleted successfully after 120 seconds.`);
 
       removeFileFromMap(userId,filename)
     }

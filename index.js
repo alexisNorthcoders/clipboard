@@ -22,6 +22,8 @@ app.use(express.static("public"));
 
 app.use(sessionMiddleware);
 
+
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/webhook", bodyParser.json({ verify: verifySignature }));
 
@@ -50,5 +52,11 @@ app.get("/test-session", (req, res) => {
     return res.status(404).send({ message: "No session found." });
   }
 });
+
+/* process.on("SIGINT", () => {
+  redisClient.quit();
+  console.log("Redis connection closed.");
+  process.exit();
+}); */
 
 module.exports = { server };
