@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { removeFileFromMap } = require("./utils");
 const fileDeletionQueue = require("./deletionQueue");
 const userFilesMap = new Map();
+
 class WebhookController {
   getWebhook(req, res) {
     const errorResponse = webhookModel.getAccessError();
