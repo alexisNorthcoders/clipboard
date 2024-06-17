@@ -48,9 +48,18 @@ class UserModel {
     db.all("SELECT id, username FROM users", [], callback);
   }
 }
+class UserFilesModel {
+  addFileToUser(userId, filePath, callback) {
+    db.run("INSERT INTO UserFiles (userId, filePath) VALUES (?, ?)", [userId, filePath], callback);
+  }
+  getFilesForUser(userId, callback) {
+    db.all("SELECT filePath FROM UserFiles WHERE userId = ?", [userId], callback);
+  }
+}
 
 module.exports = {
   webhookModel: new WebhookModel(),
   uploadModel: new UploadModel(),
   userModel: new UserModel(),
+  userFilesModel: new UserFilesModel()
 };
