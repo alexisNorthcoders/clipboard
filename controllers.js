@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { removeFileFromMap } = require("./utils");
 const fileDeletionQueue = require("./deletionQueue");
-const { redisClient, getFilesForUser, addFileToUser } = require("./redis.js");
+const { addFileToUser, getFilesForUser, deleteFileForUser, redisClient, deleteAllFilesForUser } = require("./redis.js");
 const userFilesMap = new Map();
 
 class WebhookController {
@@ -46,15 +46,12 @@ class UploadController {
     try {
       const userId = req.session.user.id;
       const newFile = { name, url: fileUrl, userId, size };
-      await addFileToUser(redisClient,userId,newFile)
+      await addFileToUser(userId, newFile); // redis
 
       const sockets = io.sockets.sockets;
-      if (!userFilesMap.has(userId)) {
-        userFilesMap.set(userId, []);
-      }
-      const filesList = userFilesMap.get(userId);
-      filesList.push(newFile);
-      req.session.files = filesList;
+
+      const filesFromUserId = await getFilesForUser(userId); // redis
+
       req.session.save((err) => {
         if (err) {
           console.error("Error saving session file data:", err);
@@ -62,8 +59,7 @@ class UploadController {
 
         sockets.forEach((socket) => {
           if (socket.handshake.session.user.id === userId) {
-            socket.emit("filesUploaded", req.session.files);
-            console.log("emitted these files: ", req.session.files);
+            socket.emit("filesUploaded", filesFromUserId);
           }
         });
       });

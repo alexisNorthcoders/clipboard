@@ -1,5 +1,6 @@
 const sharedsession = require("express-socket.io-session");
 const { userFilesMap } = require("./controllers");
+const { getFilesForUser } = require("./redis");
 
 function setupWebsocket(io, sessionMiddleware) {
   let currentClipboardData = "";
@@ -41,15 +42,16 @@ function setupWebsocket(io, sessionMiddleware) {
           });
         }
       });
-      socket.on("request_filelist", () => {
+      socket.on("request_filelist",async () => {
         if (socket.handshake.session.user) {
           const userId = socket.handshake.session.user.id;
           const sockets = io.sockets.sockets;
-          const filesList = userFilesMap.get(userId) || [];
+          const filesFromUserId = await getFilesForUser(userId); // redis
+          
 
           sockets.forEach((socket) => {
             if (socket.handshake.session.user.id === userId) {
-              socket.emit("filesUploaded", filesList);
+              socket.emit("filesUploaded", filesFromUserId);
             }
           });
         }

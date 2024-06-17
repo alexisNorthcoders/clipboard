@@ -13,35 +13,29 @@ redisClient.on("error", (err) => {
   console.error("Redis error:", err);
 });
 
-async function addFileToUser(redisClient, userId, newFile) {
+async function addFileToUser(userId, newFile) {
   try {
-    const fileId = `${userId}:${newFile.name}`;
-    await redisClient.hSet(`file:${fileId}`, newFile);
-    await redisClient.sAdd(`user:${userId}:files`, fileId);
+    const newFileString = JSON.stringify(newFile);
+    await redisClient.sAdd(`user:${userId}:files`, newFileString);
     console.log(`File ${newFile.name} added for user ${userId}`);
   } catch (err) {
     console.error("Error adding file to user:", err);
   }
 }
-
-async function getFilesForUser(userId, callback) {
-  try {
-    const fileIds = await redisClient.sMembers(`user:${userId}:files`);
-    const files = [];
-    
-    for (const fileId of fileIds) {
-      const fileData = await redisClient.hGetAll(`file:${fileId}`);
-      files.push(fileData);
+async function getFilesForUser(userId) {
+    try {
+      const fileStrings = await redisClient.sMembers(`user:${userId}:files`);
+      const files = fileStrings.map(fileString => JSON.parse(fileString));
+      return files;
+    } catch (err) {
+      console.error("Error retrieving files for user:", err);
+      throw err;
     }
-    
-    callback(null, files);
-  } catch (err) {
-    console.error("Error retrieving files for user:", err);
-    callback(err, []);
   }
-}
 
-async function deleteFileForUser(redisClient, userId, fileName) {
+
+
+async function deleteFileForUser(userId, fileName) {
   try {
     const fileId = `${userId}:${fileName}`;
     await redisClient.sRem(`user:${userId}:files`, fileId);
@@ -52,4 +46,18 @@ async function deleteFileForUser(redisClient, userId, fileName) {
   }
 }
 
-module.exports = { addFileToUser, getFilesForUser, deleteFileForUser, redisClient };
+async function deleteAllFilesForUser(userId) {
+  try {
+    const fileIds = await redisClient.sMembers(`user:${userId}:files`);
+
+    const deleteFilePromises = fileIds.map((fileId) => redisClient.del(`file:${fileId}`));
+    await Promise.all(deleteFilePromises);
+
+    await redisClient.del(`user:${userId}:files`);
+    console.log(`All files deleted for user ${userId}`);
+  } catch (err) {
+    console.error("Error deleting all files for user:", err);
+  }
+}
+
+module.exports = { addFileToUser, getFilesForUser, deleteFileForUser, redisClient, deleteAllFilesForUser };
