@@ -1,5 +1,6 @@
 const Queue = require("bull");
 const fs = require("fs");
+const { deleteFileForUser } = require("./redis");
 
 
 const fileDeletionQueue = new Queue("fileDeletion", {
