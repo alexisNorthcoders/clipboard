@@ -1,6 +1,7 @@
 const fs = require("fs").promises;
 const path = require("path");
 const crypto = require("crypto");
+
 const secret = process.env.SECRET;
 
 const getFileInformation = async (directory) => {
@@ -25,9 +26,10 @@ function verifySignature(req, res, buf) {
     throw new Error("Invalid signature.");
   }
 }
-function removeFileFromMap(map,userId, filename) {
-  if (map.has(userId)) {
-    const fileList = map.get(userId);
+function removeFileFromMap(userId, filename) {
+  const { userFilesMap } = require("./controllers");
+  if (userFilesMap.has(userId)) {
+    const fileList = userFilesMap.get(userId);
 
     const fileIndex = fileList.findIndex((file) => file.name === filename);
 
@@ -35,7 +37,7 @@ function removeFileFromMap(map,userId, filename) {
       fileList.splice(fileIndex, 1);
 
       if (fileList.length === 0) {
-        map.delete(userId);
+        userFilesMap.delete(userId);
       }
     }
   }
