@@ -3,6 +3,7 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { removeFileFromMap } = require("./utils");
+const fileDeletionQueue = require("./deletionQueue");
 const userFilesMap = new Map();
 class WebhookController {
   getWebhook(req, res) {
@@ -35,6 +36,7 @@ class UploadController {
       return res.status(400).json({ error: "No file uploaded" });
     }
     const fileUrl = uploadModel.saveFile(req.file);
+    const filePath = path.join(__dirname, fileUrl);
     const size = req.file.size;
     const name = req.file.filename;
     res.status(201).json({ fileUrl, message: "File uploaded successfully" });
@@ -61,7 +63,18 @@ class UploadController {
           }
         });
       });
-    } catch (err) {
+      
+      fileDeletionQueue.add(
+        {
+          filePath,
+          userId,
+          filename: req.file.filename,
+        },
+        {
+          delay: 5 * 1000,
+        }
+      );
+      } catch (err) {
       console.error("Error getting file stats:", err);
     }
   }
@@ -71,7 +84,7 @@ class UploadController {
 
     try {
       const response = await uploadModel.deleteFile(filename);
-      removeFileFromMap(userFilesMap, userId, filename);
+      removeFileFromMap(userId, filename);
       res.status(200).send({ message: response });
     } catch (error) {
       if (error.code === "ENOENT") {
@@ -106,7 +119,6 @@ class UserController {
       }
       const passwordIsValid = bcrypt.compareSync(password, user.password);
       const userId = user.id;
-      console.log(userId, "inside model");
       if (!passwordIsValid) {
         return res.status(401).send("Invalid password.");
       }
@@ -139,7 +151,6 @@ class UserController {
   getUsers(req, res) {
     userModel.allUsers((err, users) => {
       if (err) {
-        console.log(err);
         return res.status(400).send({ message: "Error getting list of users." });
       }
       res.status(200).send({ users });

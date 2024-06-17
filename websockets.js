@@ -12,7 +12,7 @@ function setupWebsocket(io, sessionMiddleware) {
     if (socket.handshake.session.user) {
       currentClipboardData = socket.handshake.session.clipboard || "";
       socket.emit("clipboard", currentClipboardData);
-      
+
       socket.on("clipboard", (data) => {
         socket.handshake.session.clipboard = data;
         socket.handshake.session.save((err) => {
@@ -42,12 +42,10 @@ function setupWebsocket(io, sessionMiddleware) {
         }
       });
       socket.on("request_filelist", () => {
-        console.log("filelist requested");
         if (socket.handshake.session.user) {
           const userId = socket.handshake.session.user.id;
           const sockets = io.sockets.sockets;
-          const filesList = userFilesMap.get(userId) || []
-          console.log(userFilesMap)
+          const filesList = userFilesMap.get(userId) || [];
 
           sockets.forEach((socket) => {
             if (socket.handshake.session.user.id === userId) {
@@ -56,11 +54,8 @@ function setupWebsocket(io, sessionMiddleware) {
           });
         }
       });
-      socket.on("disconnect", () => {
-        console.log("A user disconnected");
-      });
+      socket.on("disconnect", () => {});
     } else {
-      console.log("A user tried to connect without a valid session");
       socket.disconnect(true);
     }
   });
