@@ -1,6 +1,6 @@
 const Queue = require("bull");
 const fs = require("fs");
-const { removeFileFromMap } = require("./utils");
+
 
 const fileDeletionQueue = new Queue("fileDeletion", {
   redis: {
@@ -11,13 +11,13 @@ const fileDeletionQueue = new Queue("fileDeletion", {
 
 fileDeletionQueue.process(async (job) => {
   const { filePath, userId, filename } = job.data;
-  fs.unlink(filePath, (err) => {
+  fs.unlink(filePath, async (err) => {
     if (err) {
       console.error(`Error deleting file ${filePath}:`, err);
     } else {
       console.log(`File ${filePath} deleted successfully after 120 seconds.`);
 
-      removeFileFromMap(userId,filename)
+      await deleteFileForUser(userId, filename)
     }
   });
 });

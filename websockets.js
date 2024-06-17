@@ -1,5 +1,4 @@
 const sharedsession = require("express-socket.io-session");
-const { userFilesMap } = require("./controllers");
 const { getFilesForUser } = require("./redis");
 
 function setupWebsocket(io, sessionMiddleware) {
@@ -47,7 +46,7 @@ function setupWebsocket(io, sessionMiddleware) {
           const userId = socket.handshake.session.user.id;
           const sockets = io.sockets.sockets;
           const filesFromUserId = await getFilesForUser(userId); // redis
-          
+        
 
           sockets.forEach((socket) => {
             if (socket.handshake.session.user.id === userId) {

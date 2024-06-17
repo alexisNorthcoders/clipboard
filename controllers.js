@@ -2,9 +2,8 @@ const { webhookModel, uploadModel, userModel } = require("./models");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { removeFileFromMap } = require("./utils");
 const fileDeletionQueue = require("./deletionQueue");
-const { addFileToUser, getFilesForUser, deleteFileForUser, redisClient, deleteAllFilesForUser } = require("./redis.js");
+const { addFileToUser, getFilesForUser, deleteFileForUser } = require("./redis.js");
 const userFilesMap = new Map();
 
 class WebhookController {
@@ -51,6 +50,7 @@ class UploadController {
       const sockets = io.sockets.sockets;
 
       const filesFromUserId = await getFilesForUser(userId); // redis
+      console.log(filesFromUserId, "after uploading")
 
       req.session.save((err) => {
         if (err) {
@@ -84,7 +84,10 @@ class UploadController {
 
     try {
       const response = await uploadModel.deleteFile(filename);
-      removeFileFromMap(userId, filename);
+      await deleteFileForUser(userId,filename) //redis
+      const filesFromUserId = await getFilesForUser(userId); // redis
+      console.log(filesFromUserId, "after removing")
+
       res.status(200).send({ message: response });
     } catch (error) {
       if (error.code === "ENOENT") {

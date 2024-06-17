@@ -26,21 +26,5 @@ function verifySignature(req, res, buf) {
     throw new Error("Invalid signature.");
   }
 }
-function removeFileFromMap(userId, filename) {
-  const { userFilesMap } = require("./controllers");
-  if (userFilesMap.has(userId)) {
-    const fileList = userFilesMap.get(userId);
 
-    const fileIndex = fileList.findIndex((file) => file.name === filename);
-
-    if (fileIndex !== -1) {
-      fileList.splice(fileIndex, 1);
-
-      if (fileList.length === 0) {
-        userFilesMap.delete(userId);
-      }
-    }
-  }
-}
-
-module.exports = { getFileInformation, verifySignature,removeFileFromMap };
+module.exports = { getFileInformation, verifySignature };
