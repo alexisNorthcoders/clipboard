@@ -4,7 +4,6 @@ const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("./DB/database.sqlite");
 const fs = require("fs").promises;
 const path = require("path");
-const { userFilesMap } = require("./controllers");
 
 class WebhookModel {
   getAccessError() {

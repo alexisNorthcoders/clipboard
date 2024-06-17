@@ -12,7 +12,6 @@ const fileDeletionQueue = new Queue("fileDeletion", {
 
 fileDeletionQueue.process(async (job) => {
   const { filePath, userId, filename } = job.data;
-  console.log(job.data)
   fs.unlink(filePath, (err) => {
     if (err) {
       console.error(`Error deleting file ${filePath}:`, err);
