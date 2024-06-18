@@ -2,24 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 .btn {
-    @apply items-center inline-flex gap-2 py-2 px-4 rounded font-bold text-white transition duration-200 ease-in-out hover:shadow-lg active:scale-95;
-  }
-  
-  .btn-blue {
-    @apply bg-blue-500 hover:bg-blue-600 active:bg-blue-700;
-  }
-  
-  .btn-green {
-    @apply bg-green-500 hover:bg-green-600 active:bg-green-700;
-  }
-  
-  .btn-red {
-    @apply bg-red-500 hover:bg-red-600 active:bg-red-700;
-  }
-  .btn-gray {
-    @apply bg-gray-500 hover:bg-gray-600 active:bg-gray-700;
-  }
-  .overflow-text{
-    @apply overflow-hidden whitespace-nowrap
-  }
-  
+  @apply items-center inline-flex gap-2 py-2 px-4 rounded font-bold text-white transition duration-200 ease-in-out hover:shadow-lg active:scale-95;
+}
+
+.btn-blue {
+  @apply bg-blue-500 hover:bg-blue-600 active:bg-blue-700;
+}
+
+.btn-green {
+  @apply bg-green-500 hover:bg-green-600 active:bg-green-700;
+}
+
+.btn-red {
+  @apply bg-red-500 hover:bg-red-600 active:bg-red-700;
+}
+.btn-gray {
+  @apply bg-gray-500 hover:bg-gray-600 active:bg-gray-700;
+}
+.overflow-text {
+  @apply overflow-hidden whitespace-nowrap;
+}
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0% { transform: translateY(0); }
+  25% { transform: translateY(-8px); }
+  50% { transform: translateY(8px); }
+  75% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}

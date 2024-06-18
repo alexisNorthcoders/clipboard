@@ -1,7 +1,7 @@
-function flashDivBackground(div, color, duration = 300) {
-  div.classList.add("transition", `duration-${duration}`, "ease-in-out", `bg-${color}`);
+function flashDivBackground(div, color, duration = 500) {
+  div.classList.add("transition", `duration-${duration}`, "ease-in-out", `bg-${color}`, "shake");
   setTimeout(() => {
-    div.classList.remove(`bg-${color}`);
+    div.classList.remove("transition", `duration-${duration}`, "ease-in-out", `bg-${color}`, "shake");
   }, duration);
 }
 function checkUserLoggedIn() {
