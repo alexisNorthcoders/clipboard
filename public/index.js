@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const pasteButton = document.getElementById("pasteClipboard");
   const copyButton = document.getElementById("copyClipboard");
   const clearButton = document.getElementById("clearClipboard");
+  const previewButton = document.getElementById("viewImage");
   const filesListDiv = document.getElementById("filesList");
   const shareButton = document.getElementById("shareImage");
   const loginButton = document.getElementById("loginButton");
@@ -99,6 +100,17 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Failed to read clipboard contents: ", err);
     }
   });
+  previewButton.addEventListener("click", async () => {
+    const items = await navigator.clipboard.read();
+    for (const item of items) {
+      for (const type of item.types) {
+        if (type.startsWith("image")) {
+          const blob = await item.getType(type);
+          displayImage(blob);
+        }
+      }
+    }
+  });
   clearButton.addEventListener("click", async () => {
     try {
       const text = "";
@@ -119,13 +131,17 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Failed to copy text to clipboard: ", err);
     }
   });
-});
-document.addEventListener("paste", function (event) {
-  const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-  for (const item of items) {
-    if (item.type.indexOf("image") !== -1) {
-      const blob = item.getAsFile();
-      displayImage(blob);
+  document.addEventListener("paste", function (event) {
+    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    for (const item of items) {
+      console.log(item);
+      if (item.type.startsWith("image")) {
+        const blob = item.getAsFile();
+        displayImage(blob);
+      }
+      if (item.type === "text/plain") {
+        item.getAsString((text) => (textarea.value = text));
+      }
     }
-  }
+  });
 });

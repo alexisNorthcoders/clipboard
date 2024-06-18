@@ -1,5 +1,9 @@
 function flashDivBackground(div, color, duration = 500) {
-  div.classList.add("transition", `duration-${duration}`, "ease-in-out", `bg-${color}`, "shake");
+  if (color === "red-100") {
+    div.classList.add("transition", `duration-${duration}`, "ease-in-out", `bg-${color}`, "shake");
+  } else {
+    div.classList.add("transition", `duration-${duration}`, "ease-in-out", `bg-${color}`);
+  }
   setTimeout(() => {
     div.classList.remove("transition", `duration-${duration}`, "ease-in-out", `bg-${color}`, "shake");
   }, duration);
@@ -117,7 +121,6 @@ async function deleteFile(button, filename) {
     body: JSON.stringify({ filename }),
   });
   if (response.ok) {
-    
     const fileDiv = button.parentNode;
     if (fileDiv) {
       fileDiv.remove();
