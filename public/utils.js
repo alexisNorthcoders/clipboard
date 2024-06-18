@@ -1,5 +1,5 @@
 function flashDivBackground(div, color, duration = 500) {
-  if (color === "red-100") {
+  if (color.startsWith("red")) {
     div.classList.add("transition", `duration-${duration}`, "ease-in-out", `bg-${color}`, "shake");
   } else {
     div.classList.add("transition", `duration-${duration}`, "ease-in-out", `bg-${color}`);
@@ -86,9 +86,12 @@ function initiateWebsocketConnection(socket) {
   });
 
   socket.on("filesUploaded", (files) => {
-    filesListDiv.innerHTML = files
-      .map(
-        (file) => `
+    if (files.length === 0) {
+      return
+    } else {
+      filesListDiv.innerHTML = files
+        .map(
+          (file) => `
           <div class="flex flex-row items-center gap-1">
             <button onclick="downloadFile(' ${file.url}')" class="btn btn-green inline-flex gap-2 w-fit"><img src="./assets/download.svg" class="h-6 w-6 brightness-0 invert" alt="download icon"/><span class="hidden lg:block">Download</span></button>
             <a href="${file.url}" target="_blank" class="text-blue-800 font-bold hover:underline overflow-text">${file.name}</a>
@@ -96,8 +99,9 @@ function initiateWebsocketConnection(socket) {
             <button onclick="deleteFile(this,'${file.name}')" class="btn btn-red inline-flex gap-2 w-fit"><img src="./assets/delete.svg" class="h-6 w-6 brightness-0 invert" alt="download icon"/><span class="hidden lg:block">Delete</span></button>
           </div>
         `
-      )
-      .join("");
+        )
+        .join("");
+    }
   });
   return socket;
 }
