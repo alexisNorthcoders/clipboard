@@ -25,6 +25,20 @@
 .shake {
   animation: shake 0.5s ease-in-out;
 }
+.gradient-text{
+  background: linear-gradient(
+    to right,
+    black,
+    blue,
+    red,
+    blue,
+    black,
+    blue,
+    red
+  );
+  background-size: 300% 300%;
+  background-clip: text;
+}
 
 @keyframes shake {
   0% {

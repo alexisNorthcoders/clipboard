@@ -41,7 +41,17 @@ module.exports = {
     },
   ],
   theme: {
-    extend: {},
+    extend: {
+      keyframes:{
+        gradient:{
+          "0%":{backgroundPosition: "0% 50%"},
+          "100%":{backgroundPosition: "100% 50%"}
+        }
+      },
+      animation:{
+        gradient:"gradient 20s linear infinite"
+      }
+    },
   },
   plugins: [],
 };

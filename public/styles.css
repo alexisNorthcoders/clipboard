@@ -683,6 +683,20 @@ video {
   width: 100%;
 }
 
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient 20s linear infinite;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
@@ -691,6 +705,10 @@ video {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+}
+
+.resize-none {
+  resize: none;
 }
 
 .flex-row {
@@ -2175,8 +2193,8 @@ video {
   text-indent: 0.5rem;
 }
 
-.font-mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+.font-sans {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 .text-2xl {
@@ -2210,6 +2228,10 @@ video {
 .text-gray-600 {
   --tw-text-opacity: 1;
   color: rgb(75 85 99 / var(--tw-text-opacity));
+}
+
+.text-transparent {
+  color: transparent;
 }
 
 .text-white {
@@ -2376,6 +2398,22 @@ video {
 
 .shake {
   animation: shake 0.5s ease-in-out;
+}
+
+.gradient-text{
+  background: linear-gradient(
+    to right,
+    black,
+    blue,
+    red,
+    blue,
+    black,
+    blue,
+    red
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+          background-clip: text;
 }
 
 @keyframes shake {
