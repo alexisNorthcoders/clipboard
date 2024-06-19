@@ -14,6 +14,7 @@ require("dotenv").config();
 const { sessionMiddleware } = require("./middleware/sessionmiddleware");
 const { setupWebsocket } = require("./websockets");
 const { webhookController, uploadController, userController } = require("./controllers");
+const { admin } = require("./middleware/admin");
 
 setupWebsocket(io, sessionMiddleware);
 
@@ -24,20 +25,21 @@ app.use(sessionMiddleware);
 
 
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads",validateToken, express.static(path.join(__dirname, "uploads")));
 app.use("/webhook", bodyParser.json({ verify: verifySignature }));
 
 app.post("/webhook", webhookController.postWebhook);
 app.get("/webhook", webhookController.getWebhook);
 
-app.get("/upload", uploadController.getUploads);
-app.post("/upload", upload.single("file"), (req, res) => uploadController.uploadFile(req, res, io));
+app.get("/upload",admin, uploadController.getUploads);
+app.get("/users", admin,userController.getUsers);
+app.post("/upload", validateToken,upload.single("file"), (req, res) => uploadController.uploadFile(req, res, io));
 
 app.post("/register", userController.register);
 app.post("/login", userController.login);
 app.post("/logout", userController.logout);
 
-app.get("/users", userController.getUsers);
+
 
 app.post("/delete", validateToken, uploadController.removeFile);
 

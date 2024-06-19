@@ -122,13 +122,32 @@ function initiateWebsocketConnection(socket) {
   });
   return socket;
 }
-function downloadFile(url) {
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = url.split("/").pop();
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+async function downloadFile(url) {
+  const token = localStorage.getItem("accessToken");
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const blob = await response.blob();
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = url.split("/").pop();
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(downloadUrl);
+  } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+  }
 }
 async function deleteFile(button, filename) {
   const token = localStorage.getItem("accessToken");
@@ -176,6 +195,7 @@ function displayImage(blob) {
 }
 function uploadImageFromClipboard(shareButton) {
   shareButton.innerHTML = `<p class="animate-pulse">Sharing...</p>`;
+  const token = localStorage.getItem("accessToken");
 
   navigator.clipboard
     .read()
@@ -189,6 +209,9 @@ function uploadImageFromClipboard(shareButton) {
 
               fetch("/upload", {
                 method: "POST",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
                 body: formData,
               })
                 .then((response) => {

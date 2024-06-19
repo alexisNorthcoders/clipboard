@@ -72,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   uploadButton.addEventListener("click", () => {
+    const token = localStorage.getItem("accessToken");
     const file = fileInput.files[0];
     if (file) {
       const formData = new FormData();
@@ -79,10 +80,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       fetch("/upload", {
         method: "POST",
+        headers: {
+         Authorization: `Bearer ${token}`,
+        },
         body: formData,
       })
         .then((response) => {
           if (!response.ok) {
+            
             throw new Error("Network response was not ok");
           }
           return response.json();
