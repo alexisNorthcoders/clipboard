@@ -31,9 +31,13 @@ module.exports = {
     "w-fit",
     "overflow-text",
     "px-0",
-
+    "grid",
+    "grid-cols-4",
+    "w-fit",
+    "self-end",
+    "grid-cols-[auto,1fr,auto,auto]",
     {
-      pattern: /bg-(red|green|blue)-(100|200|300|400|500)/,
+      pattern: /bg-(red|green|blue|gray)-(100|200|300|400|500)/,
       variants: ["hover", "focus", "active"],
     },
     {
@@ -49,7 +53,7 @@ module.exports = {
         }
       },
       animation:{
-        gradient:"gradient 20s linear infinite"
+        gradient:"gradient 2s linear infinite"
       }
     },
   },
