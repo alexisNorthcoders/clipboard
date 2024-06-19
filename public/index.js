@@ -49,7 +49,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (response.ok) {
       console.log("Registered successfully!");
+      login(socket).then((updatedSocket) => (socket = updatedSocket));
     } else {
+      const registerError = document.getElementById("registerError");
+      registerError.classList.remove("hidden");
+      setTimeout(() => {
+        registerError.classList.add("hidden");
+      }, 3000);
       console.error("Failed to register!");
     }
   });
