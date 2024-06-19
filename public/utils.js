@@ -199,3 +199,10 @@ function toggle(passwordInputId, showElementId, hideElementId) {
   document.getElementById(showElementId).style.display = type === "password" ? "block" : "none";
   document.getElementById(hideElementId).style.display = type === "password" ? "none" : "block";
 }
+function showMessage(element,message,color){
+  element.textContent = message;
+      element.style.display = "block";
+      setTimeout(function () {
+        element.style.display = "none";
+      }, 3000);
+}

@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const passwordInput = document.getElementById("loginPassword");
   const toggleLoginPassword = document.getElementById("toggleLoginPassword");
   const toggleRegisterPassword = document.getElementById("toggleRegisterPassword");
+  const buttonMessageP = document.getElementById("buttonMessage");
 
   toggleLoginPassword.addEventListener("click", () => {
     toggle("loginPassword", "showLogin", "hideLogin");
@@ -93,7 +94,13 @@ document.addEventListener("DOMContentLoaded", () => {
   pasteButton.addEventListener("click", async () => {
     try {
       flashDivBackground(textarea, "gray-100");
+
       const text = await navigator.clipboard.readText();
+      if (!text) {
+        showMessage(buttonMessageP, "There is no content on your clipboard");
+      } else {
+        showMessage(buttonMessageP, "Text pasted from clipboard");
+      }
       textarea.value = text;
       socket.emit("clipboard", text);
     } catch (err) {
@@ -113,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   clearButton.addEventListener("click", async () => {
     try {
+      showMessage(buttonMessageP, "Clipboard content cleared");
       const text = "";
       flashDivBackground(textarea, "red-100");
       textarea.value = text;
@@ -125,6 +133,12 @@ document.addEventListener("DOMContentLoaded", () => {
   copyButton.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(textarea.value);
+
+      if (!textarea.value) {
+        showMessage(buttonMessageP, "There is nothing to copy");
+      } else {
+        showMessage(buttonMessageP, "Text copied to clipboard");
+      }
       console.log("Text copied to clipboard:", textarea.value);
       flashDivBackground(textarea, "gray-100");
     } catch (err) {

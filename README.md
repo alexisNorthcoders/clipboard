@@ -32,4 +32,4 @@ TODO:
 - Improve safety and authentication checks
 - Limit uploads folder to a set size
 - Edit image before uploading
-- Limit storage per user to 100mB
+- Limit storage per user to 100MB
