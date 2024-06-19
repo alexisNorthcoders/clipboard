@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   pasteButton.addEventListener("click", async () => {
     try {
-      flashDivBackground(textarea, "green-100");
+      flashDivBackground(textarea, "gray-100");
       const text = await navigator.clipboard.readText();
       textarea.value = text;
       socket.emit("clipboard", text);
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await navigator.clipboard.writeText(textarea.value);
       console.log("Text copied to clipboard:", textarea.value);
-      flashDivBackground(textarea, "blue-100");
+      flashDivBackground(textarea, "gray-100");
     } catch (err) {
       console.error("Failed to copy text to clipboard: ", err);
     }
