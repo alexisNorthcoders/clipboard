@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clipboard Sync</title>
+    <title>ClipCloud</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="./index.js"></script>
     <script src="./utils.js"></script>
     <link href="styles.css" rel="stylesheet" />
   </head>
-  <body class="font-sans bg-white justify-center m-0 px-1 lg:p-1">
+  <body class="font-sans bg-white justify-center m-0 px-1 lg:p-1 pb-1">
     <header id="authForms" class="border border-gray-400 items-center justify-start hidden inset-0 z-10 px-1 pb-4 lg:pb-0 mb-10 lg:mb-0 lg:mt-1 rounded lg:inset-auto bg-gradient-to-b from-gray-200 to-gray-400 flex-col gap-4 lg:bg-gray-700 w-full lg:w-fit lg:mx-auto lg:justify-center shadow-lg shadow-black lg:flex-row lg:text-xs lg:px-2">
       <form id="loginForm" class="lg:bg-transparent p-4 lg:p-0 rounded-lg mt-4 lg:mt-2">
         <input type="text" id="loginUsername" placeholder="Username" class="p-2 border border-gray-400 rounded mb-2 w-full lg:w-auto" />
@@ -83,10 +83,26 @@
           <div class="flex flex-col gap-2">
             <button id="viewImage" class="btn btn-lightgray inline-flex gap-2 w-fit"><img src="./assets/preview.svg" class="h-6 w-6" alt="view icon" /><span class="hidden lg:block">View</span></button>
             <button id="shareImage" class="btn btn-lightgray inline-flex gap-2 w-fit"><img src="./assets/share.svg" class="h-6 w-6" alt="share icon" /><span class="hidden lg:block">Share</span></button>
-            
           </div>
         </div>
       </div>
+      <section class="flex flex-col w-fit justify-between border border-gray-300 shadow-inner shadow-black p-2 rounded mt-2">
+        <h1 class="font-semibold text-2xl select-none">About</h1>
+        <p class="text-justify font-semibold">This web application allows users to easily share content by copying and pasting text or sharing files. It provides a convenient way to manage clipboard data across devices in real-time.</p>
+
+        <ul class="list-disc marker:text-black px-4">
+          <li >Effortlessly copy and paste text, images or any file across devices.</li>
+          <li >Simple login just with username and password to get right into action.</li>
+          <li >Works straight from the browser.</li>
+          <li >No need to install applications on multiple devices.</li>
+          <li >Real-time synchronization of clipboard content between multiple users.</li>
+          <li >Secure and private data transfer using encrypted connections.</li>
+          <li >Intuitive interface for seamless user experience.</li>
+          <li >Files automatically deleted.</li>
+      
+        </ul>
+        <span class="self-center"><a class="underline hover:font-bold" href="https://portfolioalexis.netlify.app/" target="_blank">Alexis</a> 2024</span>
+      </section>
     </div>
   </body>
 </html>

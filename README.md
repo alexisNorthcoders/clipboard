@@ -14,6 +14,9 @@ Key features:
 
 ![alt text](image-1.png)
 ![alt text](image-2.png)
+![alt text](image-3.png)
+![alt text](image-4.png)
+![alt text](image-5.png)
 
 Features auto-deployment script with Github webhook.
 
@@ -24,9 +27,9 @@ TODO:
   - ~~Tests for endpoint and error handling~~- done
   - ~~Button to remove files in the client side~~ - done
 - ~~Automatically remove files 5 minutes after upload~~ - done using Bull queue with redis
-- Add error messages if login or register fail
-- Styling (better spacing and color theme)
-- Animated logo (Clipboard Sync logo)
+- ~~Add error messages if login or register fail~~
+- ~~Styling (better spacing and color theme)~~
+- ~~Animated logo~~
 - ~~Save userList in database instead of a Map~~ - done using redis
 - File encryption
 - Improve safety and authentication checks
