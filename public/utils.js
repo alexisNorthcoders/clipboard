@@ -32,8 +32,8 @@ function logout(socket) {
       const textarea = document.getElementById("clipboard");
       const filesListDiv = document.getElementById("filesList");
       const container = document.getElementById("imageContainer");
-      container.innerHTML = "";
-      filesListDiv.innerHTML = "";
+      container.innerHTML = `<p class="font-semibold select-none animate-bounce px-3">The image preview will be shown here...</p>`;
+      filesListDiv.querySelector("p").textContent = "Login to see your files";
       textarea.value = "";
       logoutButton.style.display = "none";
       authForms.style.display = "flex";
@@ -87,16 +87,16 @@ function initiateWebsocketConnection(socket) {
 
   socket.on("filesUploaded", (files) => {
     if (files.length === 0) {
-      return
+      filesListDiv.querySelector("p").textContent = "You don't have any shared files";
     } else {
       filesListDiv.innerHTML = files
         .map(
           (file) => `
-          <div class="flex flex-row items-center gap-1">
-            <button onclick="downloadFile(' ${file.url}')" class="btn btn-green inline-flex gap-2 w-fit"><img src="./assets/download.svg" class="h-6 w-6 brightness-0 invert" alt="download icon"/><span class="hidden lg:block">Download</span></button>
+          <div class="grid grid-cols-[auto,1fr,auto,auto] items-center justify-between gap-1 overflow-text w-fit">
+            <button onclick="downloadFile(' ${file.url}')" class="btn btn-lightgray inline-flex gap-2 w-fit"><img src="./assets/download.svg" class="h-6 w-6" alt="download icon"/></button>
             <a href="${file.url}" target="_blank" class="text-blue-800 font-bold hover:underline overflow-text">${file.name}</a>
             <span class="overflow-text">${(file.size / 1024).toFixed(2)}KB</span>
-            <button onclick="deleteFile(this,'${file.name}')" class="btn btn-red inline-flex gap-2 w-fit"><img src="./assets/delete.svg" class="h-6 w-6 brightness-0 invert" alt="download icon"/><span class="hidden lg:block">Delete</span></button>
+            <button onclick="deleteFile(this,'${file.name}')" class="btn btn-red inline-flex gap-2 w-fit self-end"><img src="./assets/delete.svg" class="h-6 w-6" alt="download icon"/></button>
           </div>
         `
         )
@@ -115,6 +115,7 @@ function downloadFile(url) {
 }
 async function deleteFile(button, filename) {
   const token = localStorage.getItem("accessToken");
+  const filesListDiv = document.getElementById("filesList");
   const response = await fetch("/delete", {
     method: "POST",
     headers: {
@@ -128,6 +129,13 @@ async function deleteFile(button, filename) {
     const fileDiv = button.parentNode;
     if (fileDiv) {
       fileDiv.remove();
+      if (!filesListDiv.children.length) {
+        let pTag = filesListDiv.querySelector("p");
+        pTag = document.createElement("p");
+        pTag.className = "text-gray-600 indent-2 w-fit rounded select-none";
+        filesListDiv.appendChild(pTag);
+        pTag.textContent = "You don't have any shared files";
+      }
     }
   } else {
     console.log("failed to remove file");
