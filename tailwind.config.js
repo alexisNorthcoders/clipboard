@@ -36,6 +36,8 @@ module.exports = {
     "w-fit",
     "self-end",
     "grid-cols-[auto,1fr,auto,auto]",
+    "animate-spin",
+    "animate-pulse",
     {
       pattern: /bg-(red|green|blue|gray)-(100|200|300|400|500)/,
       variants: ["hover", "focus", "active"],

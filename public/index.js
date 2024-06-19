@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  shareButton.addEventListener("click", uploadImageFromClipboard);
+  shareButton.addEventListener("click", () => uploadImageFromClipboard(shareButton));
 
   textarea.addEventListener("input", () => {
     if (socket) {

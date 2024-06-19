@@ -33,7 +33,13 @@ function logout(socket) {
       const filesListDiv = document.getElementById("filesList");
       const container = document.getElementById("imageContainer");
       container.innerHTML = `<p class="font-semibold select-none animate-bounce px-3">The image preview will be shown here...</p>`;
-      filesListDiv.querySelector("p").textContent = "Login to see your files";
+      while (filesListDiv.firstChild) {
+        filesListDiv.removeChild(filesListDiv.firstChild);
+      }
+
+     
+        filesListDiv.innerHTML = `<p class="text-gray-600 indent-2 w-fit rounded select-none">Login to see your files</p>`
+      
       textarea.value = "";
       logoutButton.style.display = "none";
       authForms.style.display = "flex";
@@ -87,7 +93,9 @@ function initiateWebsocketConnection(socket) {
 
   socket.on("filesUploaded", (files) => {
     if (files.length === 0) {
-      filesListDiv.querySelector("p").textContent = "You don't have any shared files";
+      if (filesListDiv.querySelector("p")) {
+        filesListDiv.querySelector("p").textContent = "You don't have any shared files";
+      }
     } else {
       filesListDiv.innerHTML = files
         .map(
@@ -157,7 +165,9 @@ function displayImage(blob) {
 
   reader.readAsDataURL(blob);
 }
-function uploadImageFromClipboard() {
+function uploadImageFromClipboard(shareButton) {
+  shareButton.innerHTML = `<p class="animate-pulse">Sharing...</p>`;
+
   navigator.clipboard
     .read()
     .then((data) => {
@@ -175,6 +185,7 @@ function uploadImageFromClipboard() {
                 .then((response) => {
                   if (response.ok) {
                     console.log("Image uploaded successfully");
+                    shareButton.innerHTML = '<img src="./assets/share.svg" class="h-6 w-6" alt="share icon" /><span class="hidden lg:block">Share</span>';
                   } else {
                     console.error("Failed to upload image");
                   }
@@ -199,10 +210,10 @@ function toggle(passwordInputId, showElementId, hideElementId) {
   document.getElementById(showElementId).style.display = type === "password" ? "block" : "none";
   document.getElementById(hideElementId).style.display = type === "password" ? "none" : "block";
 }
-function showMessage(element,message,color){
+function showMessage(element, message, color) {
   element.textContent = message;
-      element.style.display = "block";
-      setTimeout(function () {
-        element.style.display = "none";
-      }, 3000);
+  element.style.display = "block";
+  setTimeout(function () {
+    element.style.display = "none";
+  }, 3000);
 }
