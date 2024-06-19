@@ -12,6 +12,10 @@ function setupWebsocket(io, sessionMiddleware) {
     if (socket.handshake.session.user) {
       currentClipboardData = socket.handshake.session.clipboard || "";
       socket.emit("clipboard", currentClipboardData);
+      const {username} = socket.handshake.session.user
+      socket.emit("username", username);
+
+   
 
       socket.on("clipboard", (data) => {
         socket.handshake.session.clipboard = data;
@@ -41,12 +45,11 @@ function setupWebsocket(io, sessionMiddleware) {
           });
         }
       });
-      socket.on("request_filelist",async () => {
+      socket.on("request_filelist", async () => {
         if (socket.handshake.session.user) {
           const userId = socket.handshake.session.user.id;
           const sockets = io.sockets.sockets;
           const filesFromUserId = await getFilesForUser(userId); // redis
-        
 
           sockets.forEach((socket) => {
             if (socket.handshake.session.user.id === userId) {

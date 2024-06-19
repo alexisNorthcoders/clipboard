@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleLoginPassword = document.getElementById("toggleLoginPassword");
   const toggleRegisterPassword = document.getElementById("toggleRegisterPassword");
   const buttonMessageP = document.getElementById("buttonMessage");
+  
 
   toggleLoginPassword.addEventListener("click", () => {
     toggle("loginPassword", "showLogin", "hideLogin");
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (isUserLoggedIn) {
     socket = initiateWebsocketConnection(socket);
-  }
+    }
 
   loginButton.addEventListener("click", () => login(socket).then((updatedSocket) => (socket = updatedSocket)));
   logoutButton.addEventListener("click", () => logout(socket));

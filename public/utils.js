@@ -32,17 +32,19 @@ function logout(socket) {
       const textarea = document.getElementById("clipboard");
       const filesListDiv = document.getElementById("filesList");
       const container = document.getElementById("imageContainer");
+      const welcomeMessage = document.getElementById("welcome");
       container.innerHTML = `<p class="font-semibold select-none animate-bounce px-3">The image preview will be shown here...</p>`;
       while (filesListDiv.firstChild) {
         filesListDiv.removeChild(filesListDiv.firstChild);
       }
 
-     
-        filesListDiv.innerHTML = `<p class="text-gray-600 indent-2 w-fit rounded select-none">Login to see your files</p>`
-      
+      filesListDiv.innerHTML = `<p class="text-gray-600 indent-2 w-fit rounded select-none">Login to see your files</p>`;
+
       textarea.value = "";
+      
       logoutButton.style.display = "none";
       authForms.style.display = "flex";
+      welcomeMessage.classList.add("hidden")
 
       socket.disconnect();
     })
@@ -66,6 +68,7 @@ async function login() {
     localStorage.setItem("accessToken", data.accessToken);
     authForms.style.display = "none";
     logoutButton.style.display = "flex";
+
     socket = initiateWebsocketConnection(socket);
     return socket;
   } else {
@@ -75,12 +78,18 @@ async function login() {
 function initiateWebsocketConnection(socket) {
   const textarea = document.getElementById("clipboard");
   const filesListDiv = document.getElementById("filesList");
+  const welcomeMessage = document.getElementById("welcome");
+
   socket = io();
 
   socket.on("connect", () => {
     console.log("user connected");
     socket.emit("request_clipboard");
     socket.emit("request_filelist");
+  });
+  socket.on("username", (username) => {
+    welcomeMessage.classList.remove("hidden");
+    welcomeMessage.innerText = `Welcome, ${username}!`;
   });
   socket.on("clipboard", (data) => {
     if (data) {
