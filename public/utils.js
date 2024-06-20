@@ -41,10 +41,10 @@ function logout(socket) {
       filesListDiv.innerHTML = `<p class="text-gray-600 indent-2 w-fit rounded select-none">Login to see your files</p>`;
 
       textarea.value = "";
-      
+
       logoutButton.style.display = "none";
       authForms.style.display = "flex";
-      welcomeMessage.classList.add("hidden")
+      welcomeMessage.classList.add("hidden");
 
       socket.disconnect();
     })
@@ -52,9 +52,15 @@ function logout(socket) {
       console.error("Error during logout:", error);
     });
 }
-async function login() {
-  const username = document.getElementById("loginUsername").value;
-  const password = document.getElementById("loginPassword").value;
+async function login(socket, isRegister = false) {
+  let username, password;
+  if (isRegister) {
+    username = document.getElementById("registerUsername").value;
+    password = document.getElementById("registerPassword").value;
+  } else {
+    username = document.getElementById("loginUsername").value;
+    password = document.getElementById("loginPassword").value;
+  }
 
   const response = await fetch("/login", {
     method: "POST",
@@ -126,14 +132,14 @@ async function downloadFile(url) {
   const token = localStorage.getItem("accessToken");
   try {
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error("Network response was not ok");
     }
 
     const blob = await response.blob();
@@ -146,7 +152,7 @@ async function downloadFile(url) {
     document.body.removeChild(link);
     URL.revokeObjectURL(downloadUrl);
   } catch (error) {
-    console.error('There has been a problem with your fetch operation:', error);
+    console.error("There has been a problem with your fetch operation:", error);
   }
 }
 async function deleteFile(button, filename) {

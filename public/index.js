@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (response.ok) {
       console.log("Registered successfully!");
-      login(socket).then((updatedSocket) => (socket = updatedSocket));
+      login(socket,true).then((updatedSocket) => (socket = updatedSocket));
     } else {
       const registerError = document.getElementById("registerError");
       registerError.classList.remove("hidden");
