@@ -20,27 +20,31 @@ setupWebsocket(io, sessionMiddleware);
 
 app.use(express.json());
 app.use(express.static("public"));
-app.use(bodyParser.json({limit: '10mb'}));
+app.use(bodyParser.json({ limit: "10mb" }));
+
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    limit: "10mb",
+    parameterLimit: 50000,
+  })
+);
 
 app.use(sessionMiddleware);
 
-
-
-app.use("/uploads",validateToken, express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", validateToken, express.static(path.join(__dirname, "uploads")));
 app.use("/webhook", bodyParser.json({ verify: verifySignature }));
 
 app.post("/webhook", webhookController.postWebhook);
 app.get("/webhook", webhookController.getWebhook);
 
-app.get("/upload",admin, uploadController.getUploads);
-app.get("/users", admin,userController.getUsers);
-app.post("/upload", validateToken,upload.single("file"), (req, res) => uploadController.uploadFile(req, res, io));
+app.get("/upload", admin, uploadController.getUploads);
+app.get("/users", admin, userController.getUsers);
+app.post("/upload", validateToken, upload.single("file"), (req, res) => uploadController.uploadFile(req, res, io));
 
 app.post("/register", userController.register);
 app.post("/login", userController.login);
 app.post("/logout", userController.logout);
-
-
 
 app.post("/delete", validateToken, uploadController.removeFile);
 
