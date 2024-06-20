@@ -19,6 +19,8 @@ Key features:
 ![alt text](image-5.png)
 
 Features auto-deployment script with Github webhook.
+Deployed using docker image on render https://clipcloud-dz8m.onrender.com
+
 
 
 TODO:
