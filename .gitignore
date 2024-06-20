@@ -3,3 +3,5 @@ uploads
 .env
 DB
 DB/database.sqlite
+docker-compose.yml
+Dockerfile

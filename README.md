@@ -32,7 +32,7 @@ TODO:
 - ~~Animated logo~~
 - ~~Save userList in database instead of a Map~~ - done using redis
 - File encryption
-- Improve safety and authentication checks
+- ~~Improve safety and authentication checks~~
 - Limit uploads folder to a set size
 - Edit image before uploading
 - Limit storage per user to 100MB
