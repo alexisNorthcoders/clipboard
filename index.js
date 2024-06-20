@@ -20,6 +20,7 @@ setupWebsocket(io, sessionMiddleware);
 
 app.use(express.json());
 app.use(express.static("public"));
+app.use(bodyParser.json({limit: '10mb'}));
 
 app.use(sessionMiddleware);
 
