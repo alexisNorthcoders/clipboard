@@ -26,5 +26,8 @@ function verifySignature(req, res, buf) {
     throw new Error("Invalid signature.");
   }
 }
+function randomId(length = 8) {
+  return Math.random().toString(36).substring(2, 2 + length);
+}
 
-module.exports = { getFileInformation, verifySignature };
+module.exports = { getFileInformation, verifySignature, randomId };

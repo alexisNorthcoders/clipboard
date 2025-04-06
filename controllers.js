@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const fileDeletionQueue = require("./deletionQueue");
 const { addFileToUser, getFilesForUser, deleteFileForUser } = require("./redis.js");
+const { randomId } = require("./utils.js");
 const userFilesMap = new Map();
 
 class WebhookController {
@@ -84,7 +85,7 @@ class UploadController {
 
     try {
       const response = await uploadModel.deleteFile(filename);
-      await deleteFileForUser(userId,filename) //redis
+      await deleteFileForUser(userId, filename) //redis
       const filesFromUserId = await getFilesForUser(userId); // redis
       console.log(filesFromUserId, "after removing")
 
@@ -125,7 +126,7 @@ class UserController {
       if (!passwordIsValid) {
         return res.status(401).send("Invalid password.");
       }
-      const accessToken = jwt.sign({ user: { username }, userId }, process.env.DATABASE_SECRET, { expiresIn: "30m" });
+      const accessToken = jwt.sign({ user: { username }, userId }, process.env.DATABASE_SECRET, { expiresIn: "1h" });
 
       req.session.user = user;
       req.session.save((err) => {
@@ -134,7 +135,7 @@ class UserController {
         }
         console.log("Session user set:", req.session.user);
 
-        res.status(200).send({ message: "Login successful!", accessToken });
+        res.status(200).send({ message: "Login successful!", accessToken, userId });
       });
     });
   }
@@ -151,14 +152,52 @@ class UserController {
       res.status(200).send({ message: "No user session to terminate." });
     }
   }
-  getUsers(req, res) {
-    userModel.allUsers((err, users) => {
-      if (err) {
-        return res.status(400).send({ message: "Error getting list of users." });
-      }
-      res.status(200).send({ users });
-    });
+  verifyToken(req, res) {
+  const token = req.body.token || req.headers['authorization']?.split(' ')[1];
+
+  if (!token) {
+    return res.status(400).send({ message: "No token provided." });
   }
+
+  jwt.verify(token, process.env.DATABASE_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ message: "Invalid or expired token." });
+    }
+
+    return res.status(200).send({
+      message: "Token is valid",
+      user: decoded.user,
+      userId: decoded.userId,
+      expiresIn: decoded.exp,
+    });
+  });
+}
+anonymousLogin(req, res) {
+
+  const userId = randomId();
+
+  const payload = {
+    userId,
+    username: 'anonymous',
+  };
+
+  const accessToken = jwt.sign(payload, process.env.DATABASE_SECRET, { expiresIn: '1h' });
+
+
+  res.status(200).send({
+    message: 'Anonymous login successful!',
+    accessToken,
+    userId,
+  });
+}
+getUsers(req, res) {
+  userModel.allUsers((err, users) => {
+    if (err) {
+      return res.status(400).send({ message: "Error getting list of users." });
+    }
+    res.status(200).send({ users });
+  });
+}
 }
 
 module.exports = {

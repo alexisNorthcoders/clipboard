@@ -8,6 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const { validateToken } = require("./middleware/tokenvalidator");
 require("dotenv").config();
 
@@ -32,6 +33,15 @@ app.use(
 
 app.use(sessionMiddleware);
 
+const corsOptions = {
+	origin: ["https://alexisraspberry.duckdns.org","http://192.168.4.42:7000","http://raspberrypi.local:7000", "http://raspberrypi.local:4123", "https://snakemp.duckdns.org"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+
 app.use("/uploads", validateToken, express.static(path.join(__dirname, "uploads")));
 app.use("/webhook", bodyParser.json({ verify: verifySignature }));
 
@@ -44,6 +54,8 @@ app.post("/upload", validateToken, upload.single("file"), (req, res) => uploadCo
 
 app.post("/register", userController.register);
 app.post("/login", userController.login);
+app.post('/verify-token',userController.verifyToken);
+app.post('/anonymous',userController.anonymousLogin);
 app.post("/logout", userController.logout);
 
 app.post("/delete", validateToken, uploadController.removeFile);
