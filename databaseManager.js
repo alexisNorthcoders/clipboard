@@ -9,37 +9,45 @@ async function initializeDatabase(callback) {
     }
 
     db.serialize(() => {
-      db.run("DROP TABLE IF EXISTS users", function (err) {
+      db.run("DROP TABLE IF EXISTS users", (err) => {
         if (err) {
           console.error("Error dropping users table", err.message);
           if (callback) callback(err);
           return;
         }
-        db.run("CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, password TEXT)", function (err) {
-          if (err) {
-            console.error("Error creating users table", err.message);
-            if (callback) callback(err);
-            return;
-          }
 
-          if (callback) callback(null);
-        });
-      });
-      db.run("DROP TABLE IF EXISTS UserFiles ", function (err) {
-        if (err) {
-          console.error("Error dropping UserFiles table", err.message);
-          if (callback) callback(err);
-          return;
-        }
-        db.run("CREATE TABLE IF NOT EXISTS UserFiles (userId TEXT, filePath TEXT, PRIMARY KEY (userId, filePath))", function (err) {
-          if (err) {
-            console.error("Error creating UserFiles table", err.message);
-            if (callback) callback(err);
-            return;
-          }
+        db.run(
+          "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, password TEXT)",
+          (err) => {
+            if (err) {
+              console.error("Error creating users table", err.message);
+              if (callback) callback(err);
+              return;
+            }
 
-          if (callback) callback(null);
-        });
+            db.run("DROP TABLE IF EXISTS UserFiles", (err) => {
+              if (err) {
+                console.error("Error dropping UserFiles table", err.message);
+                if (callback) callback(err);
+                return;
+              }
+
+              db.run(
+                "CREATE TABLE IF NOT EXISTS UserFiles (userId TEXT, filePath TEXT, PRIMARY KEY (userId, filePath))",
+                (err) => {
+                  if (err) {
+                    console.error("Error creating UserFiles table", err.message);
+                    if (callback) callback(err);
+                    return;
+                  }
+
+                  console.log("✅ Database initialized successfully!");
+                  if (callback) callback(null);
+                }
+              );
+            });
+          }
+        );
       });
     });
   });

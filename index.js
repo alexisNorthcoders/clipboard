@@ -34,7 +34,7 @@ app.use(
 app.use(sessionMiddleware);
 
 const corsOptions = {
-	origin: ["https://alexisraspberry.duckdns.org","http://192.168.4.42:7000","http://raspberrypi.local:7000", "http://raspberrypi.local:4123", "https://snakemp.duckdns.org"],
+	origin: [ process.env.CORS ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
