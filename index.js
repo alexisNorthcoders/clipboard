@@ -34,7 +34,7 @@ app.use(
 app.use(sessionMiddleware);
 
 const corsOptions = {
-	origin: [ process.env.CORS ],
+  origin: [process.env.CORS],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
@@ -45,6 +45,10 @@ app.use(cors(corsOptions));
 app.use("/uploads", validateToken, express.static(path.join(__dirname, "uploads")));
 app.use("/webhook", bodyParser.json({ verify: verifySignature }));
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.post("/webhook", webhookController.postWebhook);
 app.get("/webhook", webhookController.getWebhook);
 
@@ -54,8 +58,8 @@ app.post("/upload", validateToken, upload.single("file"), (req, res) => uploadCo
 
 app.post("/register", userController.register);
 app.post("/login", userController.login);
-app.post('/verify-token',userController.verifyToken);
-app.post('/anonymous',userController.anonymousLogin);
+app.post('/verify-token', userController.verifyToken);
+app.post('/anonymous', userController.anonymousLogin);
 app.post("/logout", userController.logout);
 
 app.post("/delete", validateToken, uploadController.removeFile);
