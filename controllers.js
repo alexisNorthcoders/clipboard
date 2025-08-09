@@ -30,7 +30,7 @@ class UploadController {
     }
   }
   async uploadFile(req, res, io) {
-    if (!req.file) {
+    if (!req.file || req.session?.user?.id) {
       return res.status(400).json({ error: "No file uploaded" });
     }
     const fileUrl = uploadModel.saveFile(req.file);

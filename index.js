@@ -21,7 +21,7 @@ const { logger } = require("./middleware/logger");
 setupWebsocket(io, sessionMiddleware);
 
 app.use(express.json());
-
+app.set('trust proxy', 1);
 app.use(sessionMiddleware);
 app.use(logger);
 //app.use(express.static("public"));
