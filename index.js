@@ -24,7 +24,11 @@ app.use(express.json());
 app.set('trust proxy', 1);
 app.use(sessionMiddleware);
 app.use(logger);
-//app.use(express.static("public"));
+if (process.env.NODE_ENV === "development") {
+  const clientPublicPath = path.resolve(__dirname, process.env.PATH_TO_PUBLIC_FOLDER);
+  app.use(express.static(clientPublicPath));
+
+}
 app.use(bodyParser.json({ limit: "10mb" }));
 
 app.use(
