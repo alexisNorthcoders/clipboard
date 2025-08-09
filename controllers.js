@@ -13,14 +13,10 @@ class WebhookController {
     res.status(400).send(errorResponse);
   }
   postWebhook(req, res) {
-    console.log("New deployment pushed to GitHub. Clipboard restarting.");
+    console.log("New deployment pushed to GitHub.");
     res.status(200).send("Deployment script is being executed.");
 
-    webhookModel.executeScript((error) => {
-      if (error) {
-        console.error(`exec error: ${error}`);
-      }
-    });
+    // Run webhook logic. No longer needed due to CI/CD.
   }
 }
 class UploadController {

@@ -1,21 +1,18 @@
 FROM node:18
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y redis-server
+COPY package*.json ./
+RUN npm ci
 
-RUN apt-get update && apt-get install -y git
+COPY . .
+RUN mkdir -p /app/DB
+VOLUME ["/app/DB"]
 
-RUN git clone https://github.com/alexisNorthcoders/clipboard.git .
+ENV NODE_ENV=production
+EXPOSE 4500
 
-RUN mkdir -p ./uploads
-
-RUN mkdir -p ./DB
-
-RUN npm install
-
-RUN npm run createDB
-
-EXPOSE 4321
-CMD ["bash", "-c", "service redis-server start && npm start"]
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["node", "listen.js"]
