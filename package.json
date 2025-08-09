@@ -1,6 +1,6 @@
 {
   "name": "clipcloud",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "seamlessly share content between different devices",
   "main": "index.js",
   "scripts": {
