@@ -1,10 +1,15 @@
 const session = require("express-session");
+const SQLiteStore = require("connect-sqlite3")(session);
 
 const sessionMiddleware = session({
-    secret: process.env.DATABASE_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false },
-  })
+  store: new SQLiteStore({ db: 'sessions.sqlite', dir: './DB', concurrentDB: true }),
+  secret: process.env.DATABASE_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: true,
+    maxAge: 1000 * 60 * 60
+  },
+})
 
 module.exports = { sessionMiddleware };

@@ -35,8 +35,6 @@ app.use(
   })
 );
 
-
-
 const corsOptions = {
   origin: [process.env.CORS],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
