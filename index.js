@@ -46,33 +46,33 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use("/uploads", validateToken, express.static(path.join(__dirname, "uploads")));
-app.use("/webhook", bodyParser.json({ verify: verifySignature }));
+app.use("/api/uploads", validateToken, express.static(path.join(__dirname, "uploads")));
+app.use("/api/webhook", bodyParser.json({ verify: verifySignature }));
 
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.post("/webhook", webhookController.postWebhook);
-app.get("/webhook", webhookController.getWebhook);
+app.post("/api/webhook", webhookController.postWebhook);
+app.get("/api/webhook", webhookController.getWebhook);
 
-app.get("/upload", admin, uploadController.getUploads);
-app.get("/users", admin, userController.getUsers);
-app.post("/upload", validateToken, upload.single("file"), (req, res) => uploadController.uploadFile(req, res, io));
+app.get("/api/upload", admin, uploadController.getUploads);
+app.get("/api/users", admin, userController.getUsers);
+app.post("/api/upload", validateToken, upload.single("file"), (req, res) => uploadController.uploadFile(req, res, io));
 
-app.post("/register", userController.register);
-app.post("/login", userController.login);
-app.post('/verify-token', userController.verifyToken);
-app.post('/anonymous', userController.anonymousLogin);
-app.post("/logout", userController.logout);
+app.post("/api/register", userController.register);
+app.post("/api/login", userController.login);
+app.post('/api/verify-token', userController.verifyToken);
+app.post('/api/anonymous', userController.anonymousLogin);
+app.post("/api/logout", userController.logout);
 
-app.post("/delete", validateToken, uploadController.removeFile);
+app.post("/api/delete", validateToken, uploadController.removeFile);
 
-app.get("/current", validateToken, (req, res) => {
+app.get("/api/current", validateToken, (req, res) => {
   res.send(req.user);
 });
 
-app.get("/test-session", (req, res) => {
+app.get("/api/test-session", (req, res) => {
   if (req.session.user) {
     return res.status(200).send({ sessionData: req.session.user, message: "Test successfull!" });
   } else {
