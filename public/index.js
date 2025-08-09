@@ -49,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (response.ok) {
-      console.log("Registered successfully!");
       login(socket,true).then((updatedSocket) => (socket = updatedSocket));
     } else {
       const registerError = document.getElementById("registerError");
@@ -151,7 +150,6 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         showMessage(buttonMessageP, "Text copied to clipboard");
       }
-      console.log("Text copied to clipboard:", textarea.value);
       flashDivBackground(textarea, "gray-100");
     } catch (err) {
       console.error("Failed to copy text to clipboard: ", err);
@@ -160,7 +158,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("paste", function (event) {
     const items = (event.clipboardData || event.originalEvent.clipboardData).items;
     for (const item of items) {
-      console.log(item);
       if (item.type.startsWith("image")) {
         const blob = item.getAsFile();
         displayImage(blob);

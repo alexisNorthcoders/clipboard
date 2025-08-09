@@ -47,7 +47,6 @@ class UploadController {
       const sockets = io.sockets.sockets;
 
       const filesFromUserId = await getFilesForUser(userId); // redis
-      console.log(filesFromUserId, "after uploading")
 
       req.session.save((err) => {
         if (err) {
@@ -83,7 +82,6 @@ class UploadController {
       const response = await uploadModel.deleteFile(filename);
       await deleteFileForUser(userId, filename) //redis
       const filesFromUserId = await getFilesForUser(userId); // redis
-      console.log(filesFromUserId, "after removing")
 
       res.status(200).send({ message: response });
     } catch (error) {
@@ -104,7 +102,6 @@ class UserController {
       if (err) {
         return res.status(400).send({ message: "Error registering new user." });
       }
-      console.log("New user created.");
       res.status(200).send({ message: "User created successfully" });
     });
   }
@@ -129,7 +126,6 @@ class UserController {
         if (err) {
           return res.status(500).send("Failed to save session.");
         }
-        console.log("Session user set:", req.session.user);
 
         res.status(200).send({ message: "Login successful!", accessToken, userId });
       });

@@ -19,7 +19,6 @@ async function addFileToUser(userId, newFile) {
   try {
     const newFileString = JSON.stringify(newFile);
     await redisClient.sAdd(`user:${userId}:files`, newFileString);
-    console.log(`File ${newFile.name} added for user ${userId}`);
   } catch (err) {
     console.error("Error adding file to user:", err);
   }
@@ -44,12 +43,10 @@ async function deleteFileForUser(userId, filename) {
     });
 
     if (!fileToRemove) {
-      console.log(`File ${filename} not found for user ${userId}`);
       return;
     }
 
     await redisClient.sRem(filesKey, fileToRemove);
-    console.log(`File ${filename} removed for user ${userId}`);
   } catch (err) {
     console.error("Error removing file from user:", err);
   }

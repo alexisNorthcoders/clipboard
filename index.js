@@ -16,6 +16,7 @@ const { sessionMiddleware } = require("./middleware/sessionmiddleware");
 const { setupWebsocket } = require("./websockets");
 const { webhookController, uploadController, userController } = require("./controllers");
 const { admin } = require("./middleware/admin");
+const { logger } = require("./logger");
 
 setupWebsocket(io, sessionMiddleware);
 
@@ -32,6 +33,7 @@ app.use(
 );
 
 app.use(sessionMiddleware);
+app.use(logger);
 
 const corsOptions = {
   origin: [process.env.CORS],
@@ -75,11 +77,5 @@ app.get("/test-session", (req, res) => {
     return res.status(404).send({ message: "No session found." });
   }
 });
-
-/* process.on("SIGINT", () => {
-  redisClient.quit();
-  console.log("Redis connection closed.");
-  process.exit();
-}); */
 
 module.exports = { server };
