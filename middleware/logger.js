@@ -1,22 +1,25 @@
 const logger = (req, res, next) => {
-    const start = Date.now();
+  const start = Date.now();
 
-    res.on('finish', () => {
+  res.on('finish', () => {
+    
+    const duration = Date.now() - start;
+    const userAgent = req.get('User-Agent') || 'unknown-agent';
+    const status = res.statusCode;
 
-        if (req.originalUrl.startsWith('/assets/') ||
-            req.originalUrl.endsWith('.js') ||
-            req.originalUrl.endsWith('.css')) {
-            return
-        }
-        const duration = Date.now() - start;
-        const userAgent = req.get('User-Agent') || 'unknown-agent';
+    let statusType = 'INFO';
 
-        console.log(
-            `[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms - User-Agent: ${userAgent}`
-        );
-    });
+    if (status >= 500) statusType = 'SERVER ERROR';
+    else if (status >= 400) statusType = 'CLIENT ERROR';
+    else if (status >= 300) statusType = 'REDIRECTION';
+    else if (status >= 200) statusType = 'SUCCESS';
 
-    next();
-}
+    console.log(
+      `[${new Date().toISOString()}] [${statusType}] ${req.method} ${req.originalUrl} ${status} - ${duration}ms - User-Agent: ${userAgent}`
+    );
+  });
+
+  next();
+};
 
 module.exports = { logger };
