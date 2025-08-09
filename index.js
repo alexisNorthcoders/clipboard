@@ -16,12 +16,15 @@ const { sessionMiddleware } = require("./middleware/sessionmiddleware");
 const { setupWebsocket } = require("./websockets");
 const { webhookController, uploadController, userController } = require("./controllers");
 const { admin } = require("./middleware/admin");
-const { logger } = require("./logger");
+const { logger } = require("./middleware/logger");
 
 setupWebsocket(io, sessionMiddleware);
 
 app.use(express.json());
-app.use(express.static("public"));
+
+app.use(sessionMiddleware);
+app.use(logger);
+//app.use(express.static("public"));
 app.use(bodyParser.json({ limit: "10mb" }));
 
 app.use(
@@ -32,8 +35,7 @@ app.use(
   })
 );
 
-app.use(sessionMiddleware);
-app.use(logger);
+
 
 const corsOptions = {
   origin: [process.env.CORS],
