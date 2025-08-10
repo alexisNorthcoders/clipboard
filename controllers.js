@@ -2,10 +2,13 @@ const { webhookModel, uploadModel, userModel } = require("./models");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const zlib = require("node:zlib");
+const fs = require("fs");
 const fileDeletionQueue = require("./deletionQueue");
 const { addFileToUser, getFilesForUser, deleteFileForUser } = require("./redis.js");
 const { randomId } = require("./utils.js");
-const { saveEncryptedFile } = require("./multer.js");
+const { saveEncryptedFile, encryptionKey, algorithm  } = require("./multer.js");
 const userFilesMap = new Map();
 
 class WebhookController {
@@ -91,6 +94,80 @@ class UploadController {
     } catch (error) {
       res.status(500).json({ error });
     }
+  }
+  async downloadFile(req, res) {
+    const filePath = path.join(__dirname, "uploads", req.params.filename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send("File not found");
+    }
+
+    const fileStream = fs.createReadStream(filePath);
+
+    let iv;
+    // read first 16 bytes for IV
+    let ivBuffer = Buffer.alloc(16);
+    let bytesRead = 0;
+
+    let decipher;
+
+    const initDecipherStream = () => {
+      return new require('stream').Transform({
+        transform(chunk, encoding, callback) {
+          if (bytesRead < 16) {
+            // Fill ivBuffer with first 16 bytes
+            const remaining = 16 - bytesRead;
+            if (chunk.length < remaining) {
+              chunk.copy(ivBuffer, bytesRead, 0);
+              bytesRead += chunk.length;
+              return callback(); // wait for more data
+            } else {
+              chunk.copy(ivBuffer, bytesRead, 0, remaining);
+              bytesRead += remaining;
+              iv = ivBuffer;
+
+              // create decipher after iv is ready
+              decipher = crypto.createDecipheriv(algorithm, encryptionKey, iv);
+
+              // pass remaining chunk bytes through decipher
+              const remainingChunk = chunk.slice(remaining);
+              const decrypted = decipher.update(remainingChunk);
+
+              this.push(decrypted);
+              callback();
+            }
+          } else {
+            // after iv read, just decrypt
+            const decrypted = decipher.update(chunk);
+            this.push(decrypted);
+            callback();
+          }
+        },
+        flush(callback) {
+          if (decipher) {
+            this.push(decipher.final());
+          }
+          callback();
+        }
+      });
+    };
+
+    const ivDecipherStream = initDecipherStream();
+
+    // Create gzip stream for compression
+    const gzip = zlib.createGzip();
+
+    // Set headers for download
+    res.setHeader("Content-Disposition", `attachment; filename="${req.params.filename}"`);
+    res.setHeader("Content-Encoding", "gzip");
+    res.setHeader("Content-Type", "application/octet-stream");
+
+    // Pipe: Encrypted file -> Extract IV & decrypt -> Gzip -> Response
+    fileStream.pipe(ivDecipherStream).pipe(gzip).pipe(res);
+
+    fileStream.on("error", () => res.status(500).send("Error reading file"));
+    ivDecipherStream.on("error", () => res.status(500).send("Decryption failed"));
+    gzip.on("error", () => res.status(500).send("Compression failed"));
   }
 }
 class UserController {
@@ -191,14 +268,10 @@ class UserController {
             return res.status(500).send("Failed to save session.");
           }
 
-          // Magic link - clicking this will set JWT in another device
-          const magicLink = `/anon-login?token=${accessToken}`;
-
           res.status(200).send({
             message: "Anonymous login successful!",
             userId,
-            accessToken,
-            magicLink
+            accessToken
           });
         });
       }
