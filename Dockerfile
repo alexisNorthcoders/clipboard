@@ -6,7 +6,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
-RUN mkdir -p /app/DB
+RUN mkdir -p /app/DB /app/uploads
 VOLUME ["/app/DB"]
 
 ENV NODE_ENV=production

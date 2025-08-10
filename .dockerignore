@@ -1,11 +1,14 @@
 # Prevent local DB from being baked into the image
 DB/
+uploads/
+
 
 .env
 .env.*
 
 node_modules/
 
+__tests__/
 .git
 .gitignore
 Dockerfile
