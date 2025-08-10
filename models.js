@@ -33,6 +33,9 @@ class UploadModel {
 
       return `Successfully removed the file: ${filename}`;
     } catch (err) {
+      if (err.code === "ENOENT") {
+        return 'File removed already.'
+      }
       throw err;
     }
   }

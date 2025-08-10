@@ -1,8 +1,11 @@
 const express = require("express");
+const fs = require("fs");
 const http = require("http");
 const socketIo = require("socket.io");
 const path = require("path");
-const upload = require("./multer");
+const crypto = require("crypto");
+const zlib = require("node:zlib");
+const { upload, encryptionKey, iv, algorithm } = require("./multer");
 const { verifySignature } = require("./utils");
 const app = express();
 const server = http.createServer(app);
@@ -48,7 +51,37 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use("/api/uploads", validateToken, express.static(path.join(__dirname, "uploads")));
+//app.use("/api/uploads", validateToken, express.static(path.join(__dirname, "uploads")));
+
+app.get("/api/uploads/:filename", validateToken, (req, res) => {
+  const filePath = path.join(__dirname, "uploads", req.params.filename);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send("File not found");
+  }
+
+  // Create a read stream for the encrypted file
+  const readStream = fs.createReadStream(filePath);
+
+  // Create decipher to decrypt data
+  const decipher = crypto.createDecipheriv(algorithm, encryptionKey, iv);
+
+  // Create gzip stream for compression
+  const gzip = zlib.createGzip();
+
+  // Set headers for download
+  res.setHeader("Content-Disposition", `attachment; filename="${req.params.filename}"`);
+  res.setHeader("Content-Encoding", "gzip");
+  res.setHeader("Content-Type", "application/octet-stream");
+
+  // Pipe: Encrypted file -> Decrypt -> Gzip -> Response
+  readStream.pipe(decipher).pipe(gzip).pipe(res);
+
+  readStream.on("error", () => res.status(500).send("Error reading file"));
+  decipher.on("error", () => res.status(500).send("Decryption failed"));
+  gzip.on("error", () => res.status(500).send("Compression failed"));
+});
+
 app.use("/api/webhook", bodyParser.json({ verify: verifySignature }));
 
 app.get('/api/health', (req, res) => {

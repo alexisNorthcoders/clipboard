@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const fileDeletionQueue = require("./deletionQueue");
 const { addFileToUser, getFilesForUser, deleteFileForUser } = require("./redis.js");
 const { randomId } = require("./utils.js");
+const { saveEncryptedFile } = require("./multer.js");
 const userFilesMap = new Map();
 
 class WebhookController {
@@ -33,19 +34,21 @@ class UploadController {
     if (!req.file || !req.session?.user?.id) {
       return res.status(400).json({ error: "No file uploaded" });
     }
-    const fileUrl = uploadModel.saveFile(req.file);
-    const filePath = path.join(__dirname, fileUrl);
-    const size = req.file.size;
-    const name = req.file.filename;
-    res.status(201).json({ fileUrl, message: "File uploaded successfully" });
 
     try {
+      // encrypt and save file from memory buffer
+      const savedPath = await saveEncryptedFile(req.file.buffer, req.file.originalname);
+
+      const fileUrl = `/uploads/${req.file.originalname}`;
+      const size = req.file.size;
+      const name = req.file.originalname;
+      res.status(201).json({ fileUrl, message: "File uploaded successfully" });
+
       const userId = req.session.user.id;
       const newFile = { name, url: fileUrl, userId, size };
       await addFileToUser(userId, newFile); // redis
 
       const sockets = io.sockets.sockets;
-
       const filesFromUserId = await getFilesForUser(userId); // redis
 
       req.session.save((err) => {
@@ -62,16 +65,17 @@ class UploadController {
 
       fileDeletionQueue.add(
         {
-          filePath,
+          filePath: savedPath,
           userId,
           filename: req.file.filename,
         },
         {
-          delay: 120 * 1000,
+          delay: process.env.FILE_DELETION_DELAY || 120 * 1000,
         }
       );
     } catch (err) {
-      console.error("Error getting file stats:", err);
+      console.error("Error uploading file:", err);
+      res.status(500).json({ error: "Failed to upload file" });
     }
   }
   async removeFile(req, res) {
@@ -79,17 +83,13 @@ class UploadController {
     const { userId } = req.user;
 
     try {
-      const response = await uploadModel.deleteFile(filename);
       await deleteFileForUser(userId, filename) //redis
+      const response = await uploadModel.deleteFile(filename);
       const filesFromUserId = await getFilesForUser(userId); // redis
 
       res.status(200).send({ message: response });
     } catch (error) {
-      if (error.code === "ENOENT") {
-        res.status(404).json({ error: "File not found!" });
-      } else {
-        res.status(500).json({ error });
-      }
+      res.status(500).json({ error });
     }
   }
 }
@@ -145,51 +145,51 @@ class UserController {
     }
   }
   verifyToken(req, res) {
-  const token = req.body.token || req.headers['authorization']?.split(' ')[1];
+    const token = req.body.token || req.headers['authorization']?.split(' ')[1];
 
-  if (!token) {
-    return res.status(400).send({ message: "No token provided." });
-  }
-
-  jwt.verify(token, process.env.DATABASE_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({ message: "Invalid or expired token." });
+    if (!token) {
+      return res.status(400).send({ message: "No token provided." });
     }
 
-    return res.status(200).send({
-      message: "Token is valid",
-      user: decoded.user,
-      userId: decoded.userId,
-      expiresIn: decoded.exp,
+    jwt.verify(token, process.env.DATABASE_SECRET, (err, decoded) => {
+      if (err) {
+        return res.status(401).send({ message: "Invalid or expired token." });
+      }
+
+      return res.status(200).send({
+        message: "Token is valid",
+        user: decoded.user,
+        userId: decoded.userId,
+        expiresIn: decoded.exp,
+      });
     });
-  });
-}
-anonymousLogin(req, res) {
+  }
+  anonymousLogin(req, res) {
 
-  const userId = randomId();
+    const userId = randomId();
 
-  const payload = {
-    userId,
-    username: 'anonymous',
-  };
+    const payload = {
+      userId,
+      username: 'anonymous',
+    };
 
-  const accessToken = jwt.sign(payload, process.env.DATABASE_SECRET, { expiresIn: '1h' });
+    const accessToken = jwt.sign(payload, process.env.DATABASE_SECRET, { expiresIn: '1h' });
 
 
-  res.status(200).send({
-    message: 'Anonymous login successful!',
-    accessToken,
-    userId,
-  });
-}
-getUsers(req, res) {
-  userModel.allUsers((err, users) => {
-    if (err) {
-      return res.status(400).send({ message: "Error getting list of users." });
-    }
-    res.status(200).send({ users });
-  });
-}
+    res.status(200).send({
+      message: 'Anonymous login successful!',
+      accessToken,
+      userId,
+    });
+  }
+  getUsers(req, res) {
+    userModel.allUsers((err, users) => {
+      if (err) {
+        return res.status(400).send({ message: "Error getting list of users." });
+      }
+      res.status(200).send({ users });
+    });
+  }
 }
 
 module.exports = {
