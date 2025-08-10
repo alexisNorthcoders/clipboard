@@ -166,21 +166,43 @@ class UserController {
   }
   anonymousLogin(req, res) {
 
-    const userId = randomId();
+    const anonId = randomId();
+    const username = `anon-${anonId}`;
 
-    const payload = {
-      userId,
-      username: 'anonymous',
-    };
+    const randomPasswordHash = bcrypt.hashSync(randomId(), 8);
 
-    const accessToken = jwt.sign(payload, process.env.DATABASE_SECRET, { expiresIn: '1h' });
+    userModel.createUser(
+      username, randomPasswordHash,
+      (err, userId) => {
+        if (err) {
+          return res.status(500).send("Error creating anonymous user.");
+        }
 
+        const accessToken = jwt.sign(
+          { user: { username }, userId },
+          process.env.DATABASE_SECRET,
+          { expiresIn: "1h" }
+        );
 
-    res.status(200).send({
-      message: 'Anonymous login successful!',
-      accessToken,
-      userId,
-    });
+        req.session.user = { id: userId, username, isAnonymous: true, password: randomPasswordHash };
+        console.log(req.session.user)
+        req.session.save((err) => {
+          if (err) {
+            return res.status(500).send("Failed to save session.");
+          }
+
+          // Magic link - clicking this will set JWT in another device
+          const magicLink = `/anon-login?token=${accessToken}`;
+
+          res.status(200).send({
+            message: "Anonymous login successful!",
+            userId,
+            accessToken,
+            magicLink
+          });
+        });
+      }
+    );
   }
   getUsers(req, res) {
     userModel.allUsers((err, users) => {
@@ -189,6 +211,32 @@ class UserController {
       }
       res.status(200).send({ users });
     });
+  }
+  magicLinkLogin(req, res) {
+    const { token } = req.query;
+    if (!token) {
+      return res.status(400).send("Token missing.");
+    }
+
+    try {
+      const decoded = jwt.verify(token, process.env.DATABASE_SECRET);
+      const { userId, user } = decoded;
+
+      req.session.user = { id: userId, username: user.username, isAnonymous: true };
+      req.session.save((err) => {
+        if (err) {
+          return res.status(500).send("Failed to save session.");
+        }
+
+        res.status(200).send({
+          message: "Anonymous login successful!",
+          accessToken: token,
+          userId,
+        });
+      });
+    } catch (err) {
+      return res.status(401).send("Invalid or expired token.");
+    }
   }
 }
 
