@@ -11,6 +11,7 @@ Key features:
 - **Intuitive User Experience**: Clean and simple interface featuring one-click actions to copy, paste, or clear the clipboard content.
 - **WebSocket Technology**: Real-time text sharing implemented with WebSocket communication.
 - **Automatic File Cleanup**: Files are automatically deleted from the clipboard for enhanced privacy and security.
+- **File encryption**: Files stored in the server are encrypted for secuirty.
 
 ![alt text](image-1.png)
 ![alt text](image-2.png)
