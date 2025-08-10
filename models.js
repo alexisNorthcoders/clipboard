@@ -42,7 +42,17 @@ class UploadModel {
 }
 class UserModel {
   createUser(username, hashedPassword, callback) {
-    db.run("INSERT INTO users (username, password) VALUES (?, ?)", [username, hashedPassword], callback);
+    db.run(
+      "INSERT INTO users (username, password) VALUES (?, ?)",
+      [username, hashedPassword],
+      function (err) {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, this.lastID);
+        }
+      }
+    );
   }
   findByUsername(username, callback) {
     db.get("SELECT * FROM users WHERE username = ?", [username], callback);

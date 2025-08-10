@@ -60,11 +60,57 @@ app.get("/api/uploads/:filename", validateToken, (req, res) => {
     return res.status(404).send("File not found");
   }
 
-  // Create a read stream for the encrypted file
-  const readStream = fs.createReadStream(filePath);
+  const fileStream = fs.createReadStream(filePath);
 
-  // Create decipher to decrypt data
-  const decipher = crypto.createDecipheriv(algorithm, encryptionKey, iv);
+  let iv;
+  // read first 16 bytes for IV
+  let ivBuffer = Buffer.alloc(16);
+  let bytesRead = 0;
+
+  let decipher;
+
+  const initDecipherStream = () => {
+    return new require('stream').Transform({
+      transform(chunk, encoding, callback) {
+        if (bytesRead < 16) {
+          // Fill ivBuffer with first 16 bytes
+          const remaining = 16 - bytesRead;
+          if (chunk.length < remaining) {
+            chunk.copy(ivBuffer, bytesRead, 0);
+            bytesRead += chunk.length;
+            return callback(); // wait for more data
+          } else {
+            chunk.copy(ivBuffer, bytesRead, 0, remaining);
+            bytesRead += remaining;
+            iv = ivBuffer;
+
+            // create decipher after iv is ready
+            decipher = crypto.createDecipheriv(algorithm, encryptionKey, iv);
+
+            // pass remaining chunk bytes through decipher
+            const remainingChunk = chunk.slice(remaining);
+            const decrypted = decipher.update(remainingChunk);
+
+            this.push(decrypted);
+            callback();
+          }
+        } else {
+          // after iv read, just decrypt
+          const decrypted = decipher.update(chunk);
+          this.push(decrypted);
+          callback();
+        }
+      },
+      flush(callback) {
+        if (decipher) {
+          this.push(decipher.final());
+        }
+        callback();
+      }
+    });
+  };
+
+  const ivDecipherStream = initDecipherStream();
 
   // Create gzip stream for compression
   const gzip = zlib.createGzip();
@@ -74,11 +120,11 @@ app.get("/api/uploads/:filename", validateToken, (req, res) => {
   res.setHeader("Content-Encoding", "gzip");
   res.setHeader("Content-Type", "application/octet-stream");
 
-  // Pipe: Encrypted file -> Decrypt -> Gzip -> Response
-  readStream.pipe(decipher).pipe(gzip).pipe(res);
+  // Pipe: Encrypted file -> Extract IV & decrypt -> Gzip -> Response
+  fileStream.pipe(ivDecipherStream).pipe(gzip).pipe(res);
 
-  readStream.on("error", () => res.status(500).send("Error reading file"));
-  decipher.on("error", () => res.status(500).send("Decryption failed"));
+  fileStream.on("error", () => res.status(500).send("Error reading file"));
+  ivDecipherStream.on("error", () => res.status(500).send("Decryption failed"));
   gzip.on("error", () => res.status(500).send("Compression failed"));
 });
 
@@ -100,6 +146,7 @@ app.post("/api/login", userController.login);
 app.post('/api/verify-token', userController.verifyToken);
 app.post('/api/anonymous', userController.anonymousLogin);
 app.post("/api/logout", userController.logout);
+app.get("/api/anon-login", userController.magicLinkLogin);
 
 app.post("/api/delete", validateToken, uploadController.removeFile);
 
