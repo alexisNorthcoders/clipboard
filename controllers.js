@@ -212,32 +212,6 @@ class UserController {
       res.status(200).send({ users });
     });
   }
-  magicLinkLogin(req, res) {
-    const { token } = req.query;
-    if (!token) {
-      return res.status(400).send("Token missing.");
-    }
-
-    try {
-      const decoded = jwt.verify(token, process.env.DATABASE_SECRET);
-      const { userId, user } = decoded;
-
-      req.session.user = { id: userId, username: user.username, isAnonymous: true };
-      req.session.save((err) => {
-        if (err) {
-          return res.status(500).send("Failed to save session.");
-        }
-
-        res.status(200).send({
-          message: "Anonymous login successful!",
-          accessToken: token,
-          userId,
-        });
-      });
-    } catch (err) {
-      return res.status(401).send("Invalid or expired token.");
-    }
-  }
 }
 
 module.exports = {

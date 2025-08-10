@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"name": "clipboard",
+			"path": "../clipboard"
+		},
+		{
+			"name": "clipcloud-client",
+			"path": "."
+		},
+		{
+			"path": "../../deployments"
+		}
+	],
+	"settings": {
+		"workbench.colorCustomizations": {
+			"titleBar.activeBackground": "#113ce8"
+		}
+	}
+}
