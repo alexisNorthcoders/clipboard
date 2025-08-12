@@ -20,8 +20,11 @@ const { setupWebsocket } = require("./websockets");
 const { webhookController, uploadController, userController } = require("./controllers");
 const { admin } = require("./middleware/admin");
 const { logger } = require("./middleware/logger");
+const { attachListenners } = require("./listenners");
 
 setupWebsocket(io, sessionMiddleware);
+
+attachListenners()
 
 app.use(express.json());
 app.set('trust proxy', 1);
