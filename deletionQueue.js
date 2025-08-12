@@ -1,15 +1,12 @@
 const Queue = require("bull");
 const fs = require("fs/promises");
 const { deleteFileForUser } = require("./redis");
+const observer = require("./observer")
 
 const fileDeletionQueue = new Queue("fileDeletion", {
   redis: {
     host: process.env.NODE_ENV === "development" ? "127.0.0.1" : process.env.REDIS_HOST,
     port: process.env.REDIS_PORT || 6379,
-  },
-  defaultJobOptions: {
-    removeOnComplete: true,
-    removeOnFail: true
   }
 });
 
@@ -18,25 +15,24 @@ fileDeletionQueue.process(async (job) => {
 
   try {
     await fs.unlink(filePath);
-    console.log(`File ${filePath} deleted successfully after 120 seconds.`);
+    observer.emit('fileDeleted', { filePath });
   }
-  catch (err) {
-    if (err.code === "ENOENT") {
-      console.warn(`File ${filePath} already deleted, skipping unlink.`);
+  catch (error) {
+    if (error.code === "ENOENT") {
+      observer.emit('fileAlreadyDeleted', { filePath });
     }
     else {
-      console.error(`Error deleting file ${filePath}:`, err);
+      observer.emit('fileDeletionError', { error, filePath });
     }
   }
 
   try {
     await deleteFileForUser(userId, filename);
+    observer.emit('redisEntryDeleted', { filePath });
   }
-  catch (redisErr) {
-    console.error(`Error deleting Redis entry for ${filename}:`, redisErr);
+  catch (error) {
+    observer.emit('redisDeletionError', { error, filePath });
   }
-
-  return true;
 });
 
 module.exports = fileDeletionQueue;

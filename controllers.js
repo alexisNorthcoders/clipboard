@@ -5,7 +5,11 @@ const jwt = require("jsonwebtoken");
 const fileDeletionQueue = require("./deletionQueue");
 const { addFileToUser, getFilesForUser, deleteFileForUser } = require("./redis.js");
 const { randomId } = require("./utils.js");
+<<<<<<< Updated upstream
 const { saveEncryptedFile } = require("./multer.js");
+=======
+const { saveEncryptedFile, encryptionKey, algorithm } = require("./multer.js");
+>>>>>>> Stashed changes
 const userFilesMap = new Map();
 
 class WebhookController {
@@ -63,13 +67,16 @@ class UploadController {
         });
       });
 
+      const uniqueJobId = `${userId}-${Date.now()}`;
+
       fileDeletionQueue.add(
         {
           filePath: savedPath,
           userId,
-          filename: req.file.filename,
+          filename: req.file.originalname,
         },
         {
+          jobId: uniqueJobId,
           delay: process.env.FILE_DELETION_DELAY || 120 * 1000,
         }
       );
