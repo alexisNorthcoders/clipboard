@@ -5,11 +5,7 @@ const jwt = require("jsonwebtoken");
 const fileDeletionQueue = require("./deletionQueue");
 const { addFileToUser, getFilesForUser, deleteFileForUser } = require("./redis.js");
 const { randomId } = require("./utils.js");
-<<<<<<< Updated upstream
 const { saveEncryptedFile } = require("./multer.js");
-=======
-const { saveEncryptedFile, encryptionKey, algorithm } = require("./multer.js");
->>>>>>> Stashed changes
 const userFilesMap = new Map();
 
 class WebhookController {
